@@ -1,8 +1,20 @@
 # Terrane
 
-Natural, composable verified-logic building blocks for reliable systems.
-Terrane collects reusable proofs, specs, and runtime code that stays
-mechanically checked.
+**Composable, machine-checked building blocks for reliable systems.**
+
+Terrane is a Rust research library of reusable specifications, proofs, and
+executable components. It uses Verus to check implementations against explicit
+contracts, with assumptions and verification gaps documented alongside the code.
+
+## Why Terrane?
+
+**Terrane** (pronounced *tuh-RAYN*) takes its name from geology: a
+[distinct block of Earth's crust with its own geological history](https://pubs.usgs.gov/of/1998/of98-136/doc/html/gnotes.htm).
+Terranes can join through accretion to form larger structures. The name evokes
+components with explicit boundaries and their own supporting evidence,
+composed into larger systems.
+
+## Verification approach and status
 
 The house style is a `spec fn` (mathematical definition) plus an
 `exec fn` whose `ensures result == spec(args)` clause is verified by
