@@ -3,8 +3,260 @@
 **Composable, machine-checked building blocks for reliable systems.**
 
 Terrane is a Rust research library of reusable specifications, proofs, and
-executable components. It uses Verus to check implementations against explicit
-contracts, with assumptions and verification gaps documented alongside the code.
+executable components. It uses [Verus](https://verus-lang.github.io/verus/guide/)
+to check code against explicit mathematical contracts, with assumptions and
+trusted boundaries documented alongside the implementation.
+
+The library covers the small decisions that larger systems depend on: range and
+shape checks, quorum thresholds, state transitions, capability containment,
+allocator metadata, and compiler analyses. Many modules model a bounded part of
+a system; their contracts describe exactly what is checked.
+
+[Quick start](#quick-start) · [Explore the library](#explore-the-library) ·
+[Verification](#how-verification-works) · [Development](#development) ·
+[Contributing](#contributing)
+
+> **Research preview.** The source is public for experimentation, review, and
+> contribution. APIs are evolving, known correctness issues remain open, and this
+> snapshot is **not ready for production use**. See
+> [current limitations](#current-limitations) before relying on an affected API.
+
+## Quick start
+
+With Nix installed and flakes enabled, enter the pinned development environment:
+
+```bash
+git clone https://github.com/brittonr/terrane.git
+cd terrane
+nix develop
+cargo run --locked --example core_basics
+```
+
+The example checks basic arithmetic, bounds, and quorum helpers, then prints:
+
+```text
+core basics: distance=7, bounded=10, quorum=3
+```
+
+Run the library's existing unit and property tests with:
+
+```bash
+cargo test --locked --lib
+```
+
+Ordinary Cargo builds do not invoke Verus. Without Nix, use the Rust toolchain
+pinned in [rust-toolchain.toml](rust-toolchain.toml); the Linux configuration also
+expects `clang` and `mold` on your path. See
+[.cargo/config.toml](.cargo/config.toml) for platform-specific linker settings.
+
+### Use it from Rust
+
+The Cargo package is **`verified-logic`** and its Rust import name is
+**`verified_logic`**. For experiments, pin the Git dependency to a reviewed
+revision. This example uses the source revision evaluated in the current audit:
+
+```toml
+[dependencies]
+verified-logic = { git = "https://github.com/brittonr/terrane.git", rev = "30fc0ad4789b8fd4f0b18bec6f6cc2438c7cb451" }
+```
+
+```rust
+use verified_logic::arithmetic::abs_diff;
+use verified_logic::bounds::clamp;
+use verified_logic::quorum::majority;
+
+fn main() {
+    assert_eq!(abs_diff(10, 3), 7);
+    assert_eq!(clamp(15, 0, 10), 10);
+    assert_eq!(majority(5), 3);
+}
+```
+
+Read each function's preconditions before calling it. Normal Cargo compilation
+erases Verus contracts; it does not turn them into runtime input checks. Use a
+checked entry point where the module provides one, or establish the preconditions
+in the calling code.
+
+## Explore the library
+
+Start with the [module guide](docs/module-guide.md) to choose a component by task,
+the [cookbook](docs/cookbook.md) for short workflows, or the
+[module maturity index](docs/module-index.md) for source links and evidence facts
+for every public module.
+
+| Area | Representative components |
+|---|---|
+| Arithmetic and data structures | [Arithmetic](src/arithmetic.rs), [bounds](src/bounds.rs), [collections](src/collections.rs), [bounded reductions](docs/bounded-modular-tree-fold.md) |
+| Consensus and distributed coordination | [Quorums](src/quorum.rs), [Raft metadata](src/raft_consensus_core.rs), [fenced attempts](src/fenced_attempt/identity.rs) |
+| Storage and recovery | [WAL recovery](src/wal_recovery.rs), [page checksums](src/page_checksum.rs), [snapshot admission](src/safe_snapshot_replication.rs) |
+| Capabilities and authorization | [Capability decisions](src/authorize.rs), [delegation chains](src/ucan_chain.rs), [caveat evaluation](src/ucan_caveat.rs) |
+| Memory and concurrency | [Allocator metadata](src/alloc_bitmap.rs), [bounded queues](src/bounded_mpmc.rs), [reclamation models](src/safe_reclamation_domain.rs) |
+| Compiler analysis | [Control-flow graphs](src/control_flow_graph.rs), [SSA](src/ssa_construction.rs), [instruction selection](src/instruction_selection.rs) |
+| Async and runtime models | [Task lifecycle](src/async_task_state.rs), [wakers](src/task_waker.rs), [one-shot channels](src/oneshot_channel.rs) |
+| Constraint systems | [R1CS rows](src/r1cs_constraint.rs), [gates](src/r1cs_gates.rs), [bounded systems](src/r1cs_system.rs) |
+
+These are reusable models, helpers, and admission checks. Integration with a
+network, storage engine, allocator, scheduler, or compiler needs its own
+validation. The [full module catalog](#modules) is available below.
+
+### Runnable examples
+
+Run these commands inside the development environment. Each example executes
+through ordinary Cargo; it is an introduction to the modeled API, not evidence
+of a complete downstream system.
+
+| Example | Command |
+|---|---|
+| [Core arithmetic, bounds, and quorums](examples/core_basics.rs) | `cargo run --example core_basics` |
+| [Bounded modular reduction](examples/bounded_modular_tree_fold.rs) | `cargo run --example bounded_modular_tree_fold` |
+| [Consensus admission](examples/consensus_admission.rs) | `cargo run --example consensus_admission` |
+| [UCAN and trust-policy checks](examples/ucan_web_of_trust.rs) | `cargo run --example ucan_web_of_trust` |
+| [Single-row R1CS](examples/r1cs_single_row.rs) | `cargo run --example r1cs_single_row` |
+| [Storage and allocator checks](examples/storage_allocator.rs) | `cargo run --example storage_allocator` |
+| [Integration adapters](examples/integration_adapters.rs) | `cargo run --example integration_adapters` |
+
+For a small proof you can run and an intentionally failing counterpart, see
+[runnable proof examples](docs/proof-examples.md).
+
+## How verification works
+
+A typical module contains a mathematical specification, an executable function,
+and proofs of useful properties. For example:
+
+```rust
+use vstd::prelude::*;
+
+verus! {
+    pub open spec fn abs_diff_spec(a: u64, b: u64) -> u64 {
+        if a >= b { (a - b) as u64 } else { (b - a) as u64 }
+    }
+
+    pub fn abs_diff(a: u64, b: u64) -> (result: u64)
+        ensures result == abs_diff_spec(a, b)
+    {
+        if a >= b { a - b } else { b - a }
+    }
+
+    proof fn abs_diff_symmetric(a: u64, b: u64)
+        ensures abs_diff_spec(a, b) == abs_diff_spec(b, a)
+    {}
+}
+```
+
+Verus checks the implementation against the stated postcondition, subject to its
+preconditions and trusted assumptions. [Tracey](https://tracey.bearcove.eu/)
+connects the [written requirements](docs/requirements.md) to implementation,
+proof, and test sites. Runtime tests exercise the executable code.
+
+A proved implementation can still implement an incomplete specification. A
+composition also needs to establish every required condition at its boundary.
+Review the contract, the [module's evidence facts](docs/module-index.md), and
+[open issues](https://github.com/brittonr/terrane/issues) together.
+
+Normal builds use `vstd` to erase specifications and proof code. Verification is
+a separate operation. See [runtime-cost evidence](docs/runtime-cost.md) for
+recorded normal-build observations, and the
+[trusted-boundary inventory](docs/proof-gap-sites.tsv) for the exact sites that
+rely on external implementations or assumptions.
+
+## Current limitations
+
+An audit of revision
+[`30fc0ad`](https://github.com/brittonr/terrane/commit/30fc0ad4789b8fd4f0b18bec6f6cc2438c7cb451)
+ran **5,223 existing library tests successfully** and reproduced correctness
+failures outside their coverage. The following issues track the remaining work:
+
+| Area | Open findings |
+|---|---|
+| Authentication and recovery | [Publicly constructible web-of-trust signatures](https://github.com/brittonr/terrane/issues/8); [gapped WAL recovery admission](https://github.com/brittonr/terrane/issues/9) |
+| Lifetimes and read admission | [RCU reader lifetime](https://github.com/brittonr/terrane/issues/10); [lease start bounds](https://github.com/brittonr/terrane/issues/12); [allocation generation exhaustion](https://github.com/brittonr/terrane/issues/13) |
+| Compiler and consensus models | [SSA entry parameters](https://github.com/brittonr/terrane/issues/11); [instruction-selection cost overflow](https://github.com/brittonr/terrane/issues/14); [Raft vote-ID bounds](https://github.com/brittonr/terrane/issues/15); [Wasm validation](https://github.com/brittonr/terrane/issues/6) |
+| Verification and CI | [Tracey result parsing](https://github.com/brittonr/terrane/issues/16); [postcondition parsing](https://github.com/brittonr/terrane/issues/17); [nested-module coverage](https://github.com/brittonr/terrane/issues/18); [default-branch push CI](https://github.com/brittonr/terrane/issues/19) |
+
+In particular, the current web-of-trust byte checks must not be used as
+cryptographic authentication, and recovery admission must not be assumed to
+reject every invalid log prefix. Issue threads contain reproductions and the
+acceptance criteria for repairs.
+
+The [recorded public-source validation](.cairn/archive/2026-10-14-publish-independent-public-source/design.md)
+also reports an Octet lint-baseline rejection. Publishing the source or updating
+this README does not clear that release gate.
+
+## Development
+
+The development environment and verification tools are pinned separately:
+
+| Purpose | Pin |
+|---|---|
+| Ordinary Cargo builds | `nightly-2026-10-14` |
+| Verus verifier | `0.2026.10.18.7d82994` |
+| Verus Rust toolchain | `1.99.1` |
+| Verus standard library | `vstd = "=0.0.0-2026-10-18-0147"` |
+
+See [rust-toolchain.toml](rust-toolchain.toml), [Cargo.toml](Cargo.toml),
+[flake.nix](flake.nix), and [nix/verus.nix](nix/verus.nix) for the authoritative
+configuration. The pinned Verus package includes archives for x86-64 Linux,
+Apple Silicon macOS, and Intel macOS.
+
+```bash
+cargo check --locked
+cargo test --locked
+cargo clippy --all-targets -- -D warnings
+./scripts/verus.sh          # pinned Verus proof check
+./scripts/verify.rs         # maintained verification pipeline
+```
+
+The full verification pipeline also requires `tracey` on your path; it is not
+included in the default development shell. The commands above include gates
+with known failures or enforcement gaps listed above. For module-scoped work,
+start with the focused checks in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+<details>
+<summary>Verification inventory, evidence, and specialized checks</summary>
+
+The repository maintains the following inventory. Counts describe tracked
+artifacts and source structure; they are not a guarantee of complete API or
+system correctness, and this README update does not refresh every proof receipt.
+
+**11139 Verus proofs · 5223 tests · 2270 requirements · 624 modules · 16 trusted/proof-gap boundaries**
+
+[README metrics](scripts/check-readme-metrics.rs) checks the headline format and
+source-derived module/boundary counts. Its `--full` mode checks command-backed
+proof, test, and requirement totals. The
+[proof-gap checker](scripts/check-proof-gap-inventory.rs) validates the exact
+trusted sites and their rationale against [the inventory](docs/proof-gap-sites.tsv)
+and [proof-gap policy](openspec/specs/verification-gaps/spec.md).
+
+| Evidence or compatibility topic | Guide | Maintained check |
+|---|---|---|
+| Kani evidence boundaries | [Kani boundary](docs/kani-boundary.md) | [check-kani-boundary.rs](scripts/check-kani-boundary.rs) |
+| Exported primitive evidence | [Artifact manifest](docs/proof-artifact-manifest.md) | [check-verified-primitive-manifest.rs](scripts/check-verified-primitive-manifest.rs) |
+| UCAN bridge evidence | [Bridge coverage](docs/ucan-bridge-coverage.md) | [check-ucan-bridge-coverage.rs](scripts/check-ucan-bridge-coverage.rs) |
+| Dependency and vendoring metadata | [Consumer profile](docs/verified-logic-consumer-profile.md) | [check-verified-logic-consumer-profile.rs](scripts/check-verified-logic-consumer-profile.rs) |
+| Module and example discovery | [Maturity index](docs/module-index.md) | [Catalog](scripts/check-readme-module-catalog.rs), [index](scripts/check-module-index.rs), [examples](scripts/check-examples.rs) |
+
+Further reading: [proof-evidence bundles](docs/proof-evidence-bundles.md),
+[artifact provenance](docs/proof-artifact-provenance.md),
+[Aeneas/Lean pilot](docs/aeneas-cross-verifier-pilot.md),
+[Nickel toolchain](docs/nickel-toolchain.md),
+[exporter integration](docs/nickel-export-cutover.md), and
+[upstream proof-corpus catalog](upstream-verus-corpus/catalog.ncl).
+
+Evidence remains tied to its recorded source, toolchain, assumptions, and
+provider. Historical `trellis-*` names and receipt identities are retained;
+renaming the project does not regenerate their proofs. External corpora and
+adapted upstream results do not certify Terrane or downstream systems.
+
+</details>
+
+## Contributing
+
+Bug reports, small executable counterexamples, stronger specifications, and
+focused proof or test improvements are welcome. Start with
+[CONTRIBUTING.md](CONTRIBUTING.md) for the module template, requirement annotations,
+proof-gap policy, and validation workflow. Include the affected revision and a
+minimal reproduction when [opening an issue](https://github.com/brittonr/terrane/issues/new).
+For sensitive vulnerability reports, consult [SECURITY.md](SECURITY.md).
 
 ## Why Terrane?
 
@@ -14,142 +266,42 @@ Terranes can join through accretion to form larger structures. The name evokes
 components with explicit boundaries and their own supporting evidence,
 composed into larger systems.
 
-## Verification approach and status
-
-The house style is a `spec fn` (mathematical definition) plus an
-`exec fn` whose `ensures result == spec(args)` clause is verified by
-[Verus](https://verus-lang.github.io/verus/guide/). The specs are embedded
-directly in `src/`; tracked exceptions such as `src/ssa_construction.rs`
-are listed in `openspec/specs/verification-gaps/spec.md` so any weaker
-bridge stays explicit. Requirement coverage is tracked by
-[Tracey](https://tracey.bearcove.eu/).
-
-**11139 Verus proofs · 5223 tests · 2270 requirements · 624 modules · 16 trusted/proof-gap boundaries**
-
-Terrane is an active research library. APIs, proof inventories, and verifier
-pins may evolve; each verification claim remains scoped to the exact source,
-assumptions, trusted boundaries, and toolchain recorded by its evidence.
-
-Historical proof receipts and versioned `trellis-*` policy and consumer-profile
-identifiers retain their original identity; this rename does not regenerate
-their proofs or make private source revisions publicly accessible.
-
-**Public source snapshot; NOT RELEASE-ADMITTED.** The independently derived
-history withholds original private ancestry. Operational dependencies are pinned
-to public source snapshots; the UCAN-facing profile binds an anonymously fetched,
-immutable Terrane source. Source availability and profile alignment do not confer
-downstream correctness or release eligibility.
-
-Recorded Aeneas and May 17 receipts retain their exact source and provider identities.
-The current verifier upgrade does not regenerate those receipts.
-The May 17 comparison now uses the immutable pre-upgrade source.
-
-The maintained Cairn overlay passed the pinned public CLI's native validation and
-proposal/design/tasks gates; specification sync and archive completed for the
-[public-source change](.cairn/archive/2026-10-14-publish-independent-public-source/).
-These lifecycle receipts do not establish proof or product release admission.
-
-The public-provider Octet run reaches actual linting but rejects the maintained
-baseline: `4103` warnings, `3872` new findings and `0` currently accepted findings.
-The accepted baseline and lint policy remain unchanged; resolving that rejection
-is a separate release-readiness requirement, not a source-availability claim.
-
-## Usage
-
-```toml
-[dependencies]
-verified-logic = { git = "https://github.com/OnixResearch/terrane" }
-```
-
-```rust
-use verified_logic::arithmetic::abs_diff;
-use verified_logic::bounds::clamp;
-use verified_logic::drain::can_start_op;
-use verified_logic::quorum::majority;
-
-let d = abs_diff(10, 3);       // 7
-let c = clamp(15, 0, 10);      // 10
-let m = majority(5);           // 3
-let ok = can_start_op(false);  // true (not draining)
-```
-
-For normal `cargo build`, the `vstd` crate erases all ghost code. Specs,
-proofs, preconditions, and postconditions add no runtime cost. See
-[docs/runtime-cost.md](docs/runtime-cost.md) for reproducible normal-build
-evidence records.
-
-## Runnable examples
-
-Each runtime example compiles through normal Cargo without invoking Verus. For
-Verus-focused spec/exec/ensures walkthroughs, see
-[docs/proof-examples.md](docs/proof-examples.md).
-
-- [`examples/core_basics.rs`](examples/core_basics.rs): `cargo run --example core_basics`
-- [`examples/bounded_modular_tree_fold.rs`](examples/bounded_modular_tree_fold.rs): `cargo run --example bounded_modular_tree_fold`
-- [`examples/consensus_admission.rs`](examples/consensus_admission.rs): `cargo run --example consensus_admission`
-- [`examples/ucan_web_of_trust.rs`](examples/ucan_web_of_trust.rs): `cargo run --example ucan_web_of_trust`
-- [`examples/r1cs_single_row.rs`](examples/r1cs_single_row.rs): `cargo run --example r1cs_single_row`
-- [`examples/storage_allocator.rs`](examples/storage_allocator.rs): `cargo run --example storage_allocator`
-- [`examples/integration_adapters.rs`](examples/integration_adapters.rs): `cargo run --example integration_adapters`
-
-## How it works
-
-```rust
-verus! {
-
-// Mathematical definition (ghost code, erased at compile time)
-pub open spec fn abs_diff_spec(a: u64, b: u64) -> u64 {
-    if a >= b { (a - b) as u64 } else { (b - a) as u64 }
-}
-
-// Runtime implementation — Verus checks `ensures` against the body
-pub fn abs_diff(a: u64, b: u64) -> (result: u64)
-    ensures result == abs_diff_spec(a, b)    // ← mechanically checked
-{
-    if a >= b { a - b } else { b - a }
-}
-
-// Machine-checked proof of a property
-proof fn abs_diff_symmetric(a: u64, b: u64)
-    ensures abs_diff_spec(a, b) == abs_diff_spec(b, a)
-{}
-
-} // verus!
-```
-
 ## Modules
+
+Use the [module guide](docs/module-guide.md) to find a starting point and the
+[maturity index](docs/module-index.md) to inspect the evidence associated with a
+module. Catalog descriptions summarize the modeled purpose; current contracts,
+trusted boundaries, and open issues determine what can be relied on.
+
+<details>
+<summary>Browse the complete public module catalog</summary>
 
 ### Composite primitives
 
-The `compose-verified-primitives` OpenSpec change landed twenty thin composition
-facades. Each module has a public facade, paired spec predicates, proof bridge,
-and positive / negative runtime evidence. Headline counts above are from fresh
-validation commands captured in the change evidence.
-
-| Module | Composition purpose | Status |
-|---|---|---|
-| `durable_job_executor` | durable, idempotent, retry-aware job execution | verified |
-| `distributed_lock` | stale-holder-safe lease writes with fencing tokens | verified |
-| `linearizable_read_gate` | Raft read-index / lease-read admission | verified |
-| `safe_snapshot_replication` | complete, integrity-checked snapshot installation | verified |
-| `crash_safe_page_cache` | WAL-backed dirty-page recovery | verified |
-| `verified_lsm_ingest` | flush and compaction-safe LSM ingest | verified |
-| `serializable_txn_guard` | MVCC / dependency / 2PL commit admission | verified |
-| `web_of_trust_ucan_authorizer` | UCAN authorization plus rooted web-of-trust policy | verified |
-| `policy_decision_engine` | delegation, containment, scope, pattern, and trust allow/deny | verified |
-| `blocking_bounded_channel` | bounded queue capacity plus futex/backoff waiting | verified |
-| `safe_reclamation_domain` | RCU, epoch, hazard-pointer, and ref-count reclamation | verified |
-| `cache_coherent_memory_region` | coherence, prefetch, store-buffer, and write-policy invariants | verified |
-| `verified_compiler_pipeline` | raw-IR analysis and optimization preservation | verified |
-| `backend_frame_allocator` | register/spill stack allocation conflict freedom | verified |
-| `dependency_scheduler` | DAG-safe, fair, capacity-bounded job scheduling | verified |
-| `raft_membership_manager` | safe config changes, learner promotion, leadership transfer | verified |
-| `exactly_once_ledger_transfer` | replay-safe balanced transfer posting | verified |
-| `fenced_attempt_admission` | fenced durable-attempt phases, epoch safety, event idempotence, completion linkage, and exact rejection preservation | verified |
-| `sel4_invocation_step` | bounded seL4 invocation transitions preserving invariants | verified |
-| `nix_eval_closure_policy` | Nix/Nickel merge plus reachable closure admission | verified |
-| `chaoscontrol_exploration_core` | deterministic, oracle-checked exploration steps | verified |
-| `integration_adapters` | deterministic user-facing adapters over verified consensus, UCAN, Nix/Nickel, and WAL primitives | adapter |
+| Module | Modeled purpose |
+|---|---|
+| `durable_job_executor` | durable, idempotent, retry-aware job execution |
+| `distributed_lock` | stale-holder-safe lease writes with fencing tokens |
+| `linearizable_read_gate` | Raft read-index / lease-read admission |
+| `safe_snapshot_replication` | complete, integrity-checked snapshot installation |
+| `crash_safe_page_cache` | WAL-backed dirty-page recovery |
+| `verified_lsm_ingest` | flush and compaction-safe LSM ingest |
+| `serializable_txn_guard` | MVCC / dependency / 2PL commit admission |
+| `web_of_trust_ucan_authorizer` | UCAN authorization plus rooted web-of-trust policy |
+| `policy_decision_engine` | delegation, containment, scope, pattern, and trust allow/deny |
+| `blocking_bounded_channel` | bounded queue capacity plus futex/backoff waiting |
+| `safe_reclamation_domain` | RCU, epoch, hazard-pointer, and ref-count reclamation |
+| `cache_coherent_memory_region` | coherence, prefetch, store-buffer, and write-policy invariants |
+| `verified_compiler_pipeline` | raw-IR analysis and optimization preservation |
+| `backend_frame_allocator` | register/spill stack allocation conflict freedom |
+| `dependency_scheduler` | DAG-safe, fair, capacity-bounded job scheduling |
+| `raft_membership_manager` | safe config changes, learner promotion, leadership transfer |
+| `exactly_once_ledger_transfer` | replay-safe balanced transfer posting |
+| `fenced_attempt_admission` | fenced durable-attempt phases, epoch safety, event idempotence, completion linkage, and exact rejection preservation |
+| `sel4_invocation_step` | bounded seL4 invocation transitions preserving invariants |
+| `nix_eval_closure_policy` | Nix/Nickel merge plus reachable closure admission |
+| `chaoscontrol_exploration_core` | deterministic, oracle-checked exploration steps |
+| `integration_adapters` | deterministic adapters over consensus, UCAN, Nix/Nickel, and WAL primitives |
 
 The additional `fenced_attempt_admission::verified` decision kernel proves
 specification/executable equality over seven phase and report kinds, caller-
@@ -161,7 +313,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Core arithmetic and data structures
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `arithmetic` | abs diff, saturating add/sub, checked mul, gcd, div ceil |
 | `bounded_modular_tree_fold` | bounded power-of-two `u24` admission, sequential and balanced refinement, pair-round equivalence, and exact abstract combine counts; see [the profile guide](docs/bounded-modular-tree-fold.md) |
@@ -183,7 +335,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Rust async primitives
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `async_task_state` | finite pending/ready/completed/cancelled task lifecycle admission with terminal-transition rejection proofs and focused positive/negative tests |
 | `task_waker` | finite empty/registered/notified/taken generation-tagged waker-slot admission plus no-lost-wake bridge predicates that avoid callback/fairness claims |
@@ -192,7 +344,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Circuit primitives
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `r1cs_constraint` | bounded single-row R1CS shape, modular dot product, and satisfaction admission without multi-row/proving-system claims |
 | `r1cs_bit_decomposition` | bounded two-bit decomposition over boolean R1CS witness slots without arbitrary-width range-check/proving-system claims |
@@ -204,7 +356,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Raft consensus
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `election` | leader election state machine |
 | `election_init` | candidate election initiation |
@@ -272,7 +424,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Other consensus protocols
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `paxos` | single-decree Paxos acceptor: ballot ordering, prepare/accept, promise safety |
 | `quepaxa` | finite deterministic QuePaxa proposal ordering, ISR transitions, abstract propagation, phase guards, fast path, and hedging metadata |
@@ -281,7 +433,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Capability authorization
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `access_mode` | access mode partial order (Read ⊂ Full) |
 | `authorize` | authorization composition |
@@ -295,7 +447,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Language and computation admission
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `ability_effect` | finite ability requirements, handler discharge, and sandbox attenuation |
 | `algebraic_effect` | finite algebraic-effect signatures, rows, summaries, handlers, and single-use continuations |
@@ -309,7 +461,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Memory management
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `buddy` | block sizing, buddy addressing, alignment, coalescing, order-for-size |
 | `page` | virtual address decomposition, frame numbers, page alignment |
@@ -320,7 +472,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Memory allocator
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `alloc_token` | allocation lifecycle FSM: free → allocated → freed |
 | `size_class` | size class bucketing, waste bounds, delegates to buddy order |
@@ -335,7 +487,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Concurrency primitives
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `lock_ordering` | lock acquisition order, deadlock detection, cycle freedom via strict total order |
 | `epoch_reclaim` | epoch-based reclamation: three-epoch cycling, pin/unpin, safe-to-reclaim gap proof |
@@ -368,7 +520,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Financial accounting
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `balance` | debit/credit with overflow guards |
 | `double_entry` | double-entry bookkeeping invariants |
@@ -381,7 +533,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Storage engine primitives
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `btree_balance` | B-tree node fill percentage, split/merge sizing, underfull detection |
 | `btree_insert` | B-tree node insert: sorted position, split on overflow |
@@ -399,7 +551,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Distributed systems
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `causal_order` | vector-clock-based causal ordering |
 | `circuit_breaker` | circuit breaker state machine |
@@ -417,7 +569,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Nix package manager
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `nix_attrset` | attribute set operations (get, has, merge, intersect, remove) |
 | `nix_closure` | generic closure computation |
@@ -427,7 +579,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Nickel language semantics
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `nickel_priority` | Nickel merge priority total order: Bottom < Neutral < Numeral(n) < Top |
 | `nickel_merge_split` | Nickel three-way record split: left-only, center, right-only |
@@ -439,13 +591,13 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Networking
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `tcp_state` | TCP connection state machine (RFC 793): 11 states, 18 transitions, reachability |
 
 ### Database internals
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `txn_isolation` | SQL isolation level hierarchy: Read Uncommitted through Serializable |
 | `mvcc` | multi-version concurrency control: version visibility, snapshot reads |
@@ -456,7 +608,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Graph algorithms
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `topo_sort` | topological sort via Kahn's algorithm: validity, completeness |
 | `cycle_detect` | cycle detection: remaining node count proves acyclicity |
@@ -471,7 +623,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Compiler frontend
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `hir_attribute_parsing` | finite inert parser descriptors, parser classes, target/duplicate/safety/stability policy, deterministic diagnostics, and early/late metadata agreement |
 | `hir_id_lowering` | finite owner-scoped source mappings, generated-ID freshness, created-ID use, uniqueness, and definition correspondence admission |
@@ -484,7 +636,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Compiler backend
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `backend_codegen_trace` | finite typed builder handles, MIR block mappings, source-tied operations, defined-before-use values, control targets, terminators, and local storage classes |
 | `rustc_monomorphization` | finite concrete function/static/shim collection, reachability deduplication, stable/volatile classification, and disjoint complete unit admission |
@@ -498,7 +650,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Scheduling primitives
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `deadline_queue` | earliest-deadline-first ordering, deadline comparison |
 | `fair_share` | weighted fair allocation: monotonicity, conservation |
@@ -508,7 +660,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Job runner
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `job_state` | job lifecycle FSM: Pending → Ready → Running → Completed/Failed/Cancelled |
 | `job_priority` | priority ordering: (class, sequence) total order, higher-first selection |
@@ -525,13 +677,13 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Serialization
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `serialize_inj` | canonical byte encoding injectivity: tag-length-value roundtrips, u64 encode/decode |
 
 ### Systems decision logic
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `approval` | merge gating: approval counting, stale detection |
 | `backoff` | exponential backoff with cap and jitter bounds |
@@ -575,7 +727,7 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Generic proof infrastructure
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `algebraic` | commutative, associative, idempotent, semilattice, partial order predicates |
 | `pointwise` | scalar operation lifting to sequences |
@@ -595,16 +747,17 @@ storage, verifier soundness, a Valence property receipt, or release eligibility.
 
 ### Cross-module properties
 
-| Module | What it verifies |
+| Module | Modeled behavior |
 |---|---|
 | `properties` | 200+ cross-module proofs: signal↔bitwise, permission independence, escrow↔balance, ledger↔transfer, fee conservation, election↔quorum, fencing↔CAS, vector clock↔CRDT, mpmc↔mpsc occupancy, spin↔CAS retry, seqlock↔memory order, RCU↔epoch reclaim, ref count↔hazard pointer, lock ordering↔ticket lock, barrier↔quorum, futex↔notify roundtrip, job state↔timeout↔result, CAS ABA↔pack roundtrip, concurrency protocol↔data structure composition, choreography projection/choice/step correspondence |
 | `concurrent_composition` | concurrency protocol ↔ data structure invariant chains across 7 groups |
 | `consensus_path` | end-to-end Raft read/write path composition proofs |
 | `consensus_fast_path` | crash-fault fast-quorum arithmetic, same-view certificates, ordering prerequisites, commutativity contract, recovery barrier, and dual-path convergence proofs |
 
-### Additional public module coverage
+### Additional public modules
 
-The drift checker treats the compact lists below as README catalog entries for public modules whose detailed descriptions remain in the crate-level `src/lib.rs` documentation. Keep these names synchronized with `pub mod` declarations; add a fuller table row above when a module needs human-facing explanation.
+Additional modules are grouped below; detailed descriptions are in the
+[crate-level source documentation](src/lib.rs).
 
 - **beam**: `beam_link`, `beam_mailbox`, `beam_monitor`, `beam_process`, `beam_registry`, `beam_scheduler`, `beam_send`
 - **bounded**: `bounded_interval`
@@ -665,237 +818,17 @@ The drift checker treats the compact lists below as README catalog entries for p
 - **web**: `web_of_trust_attestation`, `web_of_trust_chain`, `web_of_trust_policy`, `web_of_trust_principal`, `web_of_trust_resolution`, `web_of_trust_revocation`
 - **zircon**: `zircon_channel`, `zircon_event`, `zircon_fifo`, `zircon_futex`, `zircon_handle`, `zircon_job`, `zircon_port`, `zircon_rights`, `zircon_socket`, `zircon_timer`, `zircon_wait`
 
-## Development
-
-Start with [CONTRIBUTING.md](CONTRIBUTING.md) for the public workflow, module template, Tracey annotation rules, proof-gap policy, and baseline/final validation expectations. Use [docs/module-guide.md](docs/module-guide.md) to choose modules by task or problem domain, [docs/module-index.md](docs/module-index.md) for objective module maturity facts, [docs/invariant-surface-catalog.md](docs/invariant-surface-catalog.md) for invariant evidence rows, [docs/proof-evidence-bundles.md](docs/proof-evidence-bundles.md) for downstream evidence export, [docs/proof-evidence-ir-chain.json](docs/proof-evidence-ir-chain.json) for linked verifier-receipt evidence chains, [docs/kani-boundary.md](docs/kani-boundary.md) for complementary Kani evidence boundaries, [docs/proof-artifact-manifest.md](docs/proof-artifact-manifest.md) for exported primitive manifest rows, [docs/ucan-bridge-coverage.md](docs/ucan-bridge-coverage.md) for UCAN bridge coverage, [docs/verified-logic-consumer-profile.md](docs/verified-logic-consumer-profile.md) for direct dependency and audited vendoring metadata, and [docs/cookbook.md](docs/cookbook.md) for short workflow recipes.
-
-Nix proof checks use locked public inputs and the pinned October Verus archive.
-Ordinary Cargo builds use `nightly-2026-10-14` for registered lint tools.
-Verus uses its own Rust `1.99.1` toolchain.
-Lifecycle changes need the public Cairn CLI and the policy in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-For confidential vulnerability reports, see [SECURITY.md](SECURITY.md).
-
-```bash
-nix develop                # enter devshell
-pre-commit install         # install the local Octet pre-commit hook
-cargo check                # compile (ghost code erased)
-cargo test                 # run runtime unit, property, and doc tests
-cargo clippy --all-targets -- -D warnings
-```
-
-## Verification
-
-Current proofs use Verus `0.2026.10.18.7d82994` and
-`vstd = "=0.0.0-2026-10-18-0147"`. Nix checks each platform archive against its pinned SHA-256.
-Sail can verify the same library with its compatible Verus fork:
-
-```sh
-RUSTUP_TOOLCHAIN=1.99.1 sail verify --lib --output json -- \
-  --triggers-mode silent --rlimit 20
-```
-
-Sail proof reuse needs a Cargo configuration without `build.rustc-wrapper`.
-Configuration files in workspace ancestors also apply.
-Global Cargo configuration is outside this repository.
-
-With Sail `2293db1`, local verification passed, but repeated runs did not reuse whole-target proofs.
-Sail reported new build-script input declarations on each run.
-
-```bash
-./scripts/verify.rs        # all gates: clippy → tests → verus → coverage
-nix build .#checks.$(nix eval --raw --impure --expr 'builtins.currentSystem').octet --no-link -L # Octet lints
-./scripts/verus.sh         # verus only
-./scripts/check-coverage.rs   # every pub fn has r[impl] annotation
-./scripts/check-ensures.rs    # every pub fn in verus! has ensures
-./scripts/checker-fixtures.rs # valid/invalid regression fixtures for checker behavior
-./scripts/check-verification-policy.rs # Terrane policy semantics and fixtures
-./scripts/check-nickel-export-cutover.rs --check # standalone exact-byte freshness and legacy parity
-./scripts/check-nickel-export-cutover.rs --self-test # fail-closed exporter controls
-./scripts/check-readme-module-catalog.rs # README module catalog drift and fixture self-test
-./scripts/check-crate-metadata.rs # Cargo package metadata discoverability and local path validation
-./scripts/check-module-guide.rs # task-oriented module guide link drift and fixture self-test
-./scripts/check-module-index.rs # generated module maturity index drift and fixture self-test
-./scripts/check-cookbook.rs # cookbook recipe field/link drift and fixture self-test
-./scripts/check-examples.rs # runnable example link/run-command drift and fixture self-test
-./scripts/check-proof-examples.sh # positive and expected-failure runnable proof examples
-cargo run --quiet --bin proof_evidence -- check # deterministic proof-evidence bundle validation
-cargo run --quiet --bin proof_evidence_ir -- check # deterministic proof-evidence IR chain validation
-./scripts/check-runtime-evidence.rs # runtime-cost evidence record metadata and fixture self-test
-./scripts/check-kani-boundary.rs # Kani external-evidence boundary docs and positive/negative fixtures
-./scripts/check-verified-primitive-manifest.rs # exported primitive manifest freshness and positive/negative fixtures
-./scripts/check-ucan-bridge-coverage.rs # UCAN bridge coverage manifest and positive/negative fixtures
-./scripts/check-verified-logic-consumer-profile.rs # typed direct-dependency and vendored-snapshot compatibility profile
-./scripts/check-readme-metrics.rs # README headline metrics drift; --full refreshes command-backed counts
-./scripts/check-proof-gap-inventory.rs # proof-gap counts, exact sites, classifications, and rationale manifest
-./scripts/check-upstream-verus-corpus.rs # typed catalog and boundary validation; add --self-test for negative cases
-./scripts/check-aeneas-cross-verifier.rs --check # exact source, generated model, theorem, trust, and receipt linkage
-./scripts/check-aeneas-cross-verifier.rs --self-test # positive profile plus 18 tamper and classification cases
-nix build .#checks.$(nix eval --raw --impure --expr 'builtins.currentSystem').aeneas-cross-verifier-pilot --no-link -L
-nix build .#checks.$(nix eval --raw --impure --expr 'builtins.currentSystem').nickel-export-cutover --no-link -L
-nix build .#checks.$(nix eval --raw --impure --expr 'builtins.currentSystem').upstream-verus-corpus --no-link -L
-nix build .#checks.$(nix eval --raw --impure --expr 'builtins.currentSystem').verusfmt-ratchet --no-link -L
-nix build .#checks.$(nix eval --raw --impure --expr 'builtins.currentSystem').verus-upgrade-trial --no-link -L
-```
-
-Proof configuration uses the exact reviewed Nickel cohort. See [docs/nickel-toolchain.md](docs/nickel-toolchain.md).
-
-The standalone export rail pins `OnixResearch/nickel-export` revision `257fafc1c746f1faf156207043a4c826bfb16d49`. It compares nine exact outputs and 31 invalid fixtures.
-
-Terrane retains policy, proof, destination, and release authority. The existing checkers remain available through explicit legacy-parity rollback modes.
-
-See [docs/nickel-export-cutover.md](docs/nickel-export-cutover.md) for the checked profile, commands, and non-claims.
-
-The Aeneas pilot selects only `src/arithmetic.rs::abs_diff` from normal Cargo macro erasure. It does not use a copied Rust function.
-
-The historical Aeneas pilot records Octet revision `890f424cd7b1b2015f39c0eb5747f1bd1e576028`; `flake.nix` selects its independently published public source for acquisition. Frozen receipts are not relabelled as current-source admission.
-
-Charon emits one non-errorful LLBC declaration. Aeneas maps it to `verified_logic.arithmetic.abs_diff` in one generated Lean file.
-
-Lean checks separate symmetry and self-zero theorems. The trust audit records `propext`, `Classical.choice`, and `Quot.sound` for the selected declarations.
-
-The false theorem fails in Lean. Octet's adequacy policy rejects the vacuous theorem before proof promotion.
-
-The Terrane receipt and cross-verifier manifest bind exact BLAKE3 identities. They do not merge Verus and Aeneas authority or claim semantic equivalence.
-
-See [docs/aeneas-cross-verifier-pilot.md](docs/aeneas-cross-verifier-pilot.md) for scope, commands, identities, and non-claims.
-
-`upstream-verus-corpus/catalog.ncl` pins source snapshots for verifier-upgrade
-regression selection. Its source-intake check validates exact fixed-output
-hashes, license files, and sentinels; it does not run or import upstream proofs.
-Promotion to Terrane formal evidence still requires an exact local verifier run,
-assumption account, source/proof/tool bindings, and Terrane-owned receipt.
-
-The May 17 comparison uses immutable Terrane source
-`65058ec60d69e405ffd324c44cf9fcba5177d453`.
-It retains the original verifier pins, corpus patches, negative controls, and expected results.
-It does not certify the October verifier or the updated source.
-
-| Historical cohort | Expected verified count |
-|---|---:|
-| March verifier, pinned Terrane snapshot | 11142 |
-| May verifier, pinned Terrane snapshot | 11142 |
-| Adapted IronKV | 312 |
-| Adapted verified-memory-allocator | 732 |
-| Unmodified verified-node-replication | 254 |
-
-The SOSP microcases remain diagnostic-only. VerusBelt remains a Rocq reference audit.
-Adapted-source results do not certify the unmodified upstream revisions.
-
-The default proof check and wrapper use the Terrane-owned package in `nix/verus.nix`.
-Its October verifier and Rust `1.99.1` are independent of the historical Octet provider.
-
-
-The formatter still uses Octet's revision-bound `verusfmt` and typed profile.
-`upstream-verus-corpus/verusfmt-baseline.txt` remains the exact migration ratchet.
-A new nonconforming file, stale baseline entry, or profile drift fails.
-The formatter's May compatibility identity does not certify October proofs.
-
-
-The Octet check uses `octet-baseline.json` to accept current warning-level
-findings while rejecting any new unbaselined stable finding ID. The local
-pre-commit hook delegates to that same pinned Nix check.
-
-## Structure
-
-```
-src/lib.rs              ← crate root, 604 public module declarations
-src/<module>.rs         ← spec fn + exec fn + proof fn + #[cfg(test)] tests
-docs/requirements.md    ← canonical requirement prose and Tracey anchors
-scripts/verus.sh        ← pinned Verus package resolver
-scripts/verify.rs       ← full verification pipeline
-scripts/check-*.rs      ← annotation enforcement
-```
-
-Most modules follow the same pattern (tracked exceptions are listed in
-`openspec/specs/verification-gaps/spec.md`):
-
-1. `pub open spec fn *_spec(...)` — mathematical definition with `r[depends]` annotation
-2. `pub fn *(...)` with `ensures result == *_spec(args)` — runtime code with `r[impl]` annotation
-3. `proof fn` — properties of the spec with `r[verify]` annotation
-4. `#[cfg(test)]` — unit tests and proptest property tests
-
-## Trusted and proof-gap items
-
-`16` items are marked `#[verifier::external_body]` across `6` files. The
-previous `src/instruction_selection.rs` runtime-only public API exemptions now
-have direct Tracey implementation and test coverage.
-
-**16 permanent** (architectural trust boundaries):
-
-- **4 legacy cryptographic hash axioms / exec bridges** (`chain.rs`,
-  `snapshot_integrity.rs`) — BLAKE3-style hashing is modeled with
-  uninterpreted specs plus trusted collision-resistance/runtime wrappers;
-  equal-input determinism now follows directly from pure spec equality.
-- **1 version comparison bridge** (`nix_version.rs`) — the recursive `cv_fuel`
-  proof lemmas are now internalized, while the exec/spec connection still
-  exceeds solver budget.
-- **10 UCAN codec/signature bridges** (`ucan_did.rs`, `ucan_signature.rs`) —
-  base58btc and Ed25519 behavior is modeled behind external codec/crypto
-  contracts; `ucan_cid.rs` now composes its CID multibase round-trip model from
-  the shared DID base58btc contract instead of carrying a separate CID axiom,
-  and public DID decode now composes verified prefix, base58, varint, and
-  key-suffix primitives around the remaining base58btc contract. Base58btc
-  decode also performs verified alphabet screening before the trusted codec
-  core. UCAN signature byte-level entrypoints now reject malformed key/signature
-  lengths through verified constructors before invoking trusted Ed25519 crypto.
-- **1 web-of-trust crypto bridge** (`web_of_trust_principal.rs`) — principal
-  digest derivation stays behind a trusted runtime/model boundary; attestation
-  and revocation signature-input construction and comparison are now verified
-  from canonical bytes.
-
-**0 closeable** — the former runtime-only public APIs in
-`src/instruction_selection.rs` now have direct Tracey implementation and test
-coverage for their well-formedness, matching, tiling, coverage, soundness,
-projection, evaluation, and validity contracts.
-Def-site collection, IDF computation, SSA-property checking, and phi elimination
-are internalized now; runtime tests and manual oracles still cover the stronger
-remaining SSA semantic claims.
-
-In addition to `external_body`, the current audit also tracks:
-
-- `0` `assume_specification[...]` exec bridges
-- `0` runtime-only `@verified-logic:exempt` public API proof gaps
-- `0` `@verified-logic:no-ensures` markers
-- `0` `assume(...)` soundness oracles
-- `0` placeholder-spec surfaces
-
-All trusted/proof-gap items remain listed in `openspec/specs/verification-gaps/spec.md`, and `docs/proof-gap-sites.tsv` is the checked per-site source for exact trusted-boundary rationale.
+</details>
 
 ## License
 
-Terrane project source is offered under `MPL-2.0`; see [LICENSE](LICENSE). Modifications to covered files remain available under MPL terms, while a larger work may keep separate files under other licenses subject to the MPL.
+Terrane project source is licensed under the **Mozilla Public License 2.0**;
+see [LICENSE](LICENSE). Contributions are accepted under the same license.
 
-The crate's `MPL-2.0` metadata does not relicense copied third-party material.
-The [Cairn policy projection](cairn-policy/UPSTREAM.md) and pinned
-[Nickel authoring inputs](cairn-policy/upstream-source/) have a subsequent
-[license grant for their exact historical blobs](cairn-policy/LICENSING.md).
-Terrane selects MIT for those copies and includes the
-[Cairn copyright notice and license text](LICENSES/Cairn-MIT.txt). The earlier
-[AGPL license text](LICENSES/AGPL-3.0-or-later.txt) remains available as an
-alternative; the [checked import procedure](cairn-policy/sync-cairn-source.py)
-preserves the original source identities. The Cairn CLI/export toolchain and
-private history are not bundled or relicensed by this choice.
-Machine-checked properties are bounded to the admitted source, verifier,
-assumptions, and receipts; license metadata does not certify downstream behavior
-or transfer whole-system proof authority.
-
-## References
-
-- Lattice/Salt verification-product patterns — external design reference only; not vendored, executed, or treated as trusted Terrane validation evidence.
-- [Kani: A Model Checker for Rust](https://arxiv.org/html/2607.01504v1) — external Kani model-checking reference for complementary runtime evidence only; not treated as a Terrane proof artifact.
-- [verus-lang/verus-belt](https://github.com/verus-lang/verus-belt) — semantic-foundation and assumption-audit corpus tied to its recorded Verus snapshot; not a soundness certificate for later releases.
-- [verus-lang/paper-sosp24-artifact](https://github.com/verus-lang/paper-sosp24-artifact) — pinned reproducibility and verifier-upgrade benchmark corpus with mixed upstream license boundaries.
-- [verus-lang/verified-memory-allocator](https://github.com/verus-lang/verified-memory-allocator) — allocator/raw-pointer proof-pattern corpus only; its feature omissions preclude production allocator adoption here.
-- [verus-lang/verified-ironkv](https://github.com/verus-lang/verified-ironkv) — host-layer proof and distributed-boundary regression corpus; no crash-recovery or whole-distributed-system claim transfers.
-- [verus-lang/verified-node-replication](https://github.com/verus-lang/verified-node-replication) — local multicore/NUMA proof corpus only; May 17 compatibility does not turn it into network replication, consensus, or an admitted runtime dependency.
-- [verus-lang/verusfmt](https://github.com/verus-lang/verusfmt) — pinned source-format ratchet; formatter output is not proof evidence.
-- [Steel](https://github.com/mattwparas/steel) — external Scheme interpreter reference for finite reader, interning, module, contract, bytecode, and value-graph primitive ideas only; not vendored, executed, or treated as trusted Terrane validation evidence.
-- [`stonysystems/jetpack` at `c03e318ec355b11edd42aac56c68d0765f88d1d2`](https://github.com/stonysystems/jetpack/tree/c03e318ec355b11edd42aac56c68d0765f88d1d2) and the [OSDI 2026 paper](https://www.usenix.org/system/files/osdi26-tang.pdf) — pinned MIT-licensed design, TLA+, and fault-scenario references for reusable crash-fault fast-path proof obligations; external proofs, implementation behavior, and benchmark claims do not transfer to Terrane.
-- [AeneasVerif/aeneas](https://github.com/AeneasVerif/aeneas) at `bc2eb6f941369fa3c695e30598b5758b11e4f0de` and [OnixResearch/octet](https://github.com/OnixResearch/octet) at `890f424cd7b1b2015f39c0eb5747f1bd1e576028` — exact-source Aeneas/Lean provider and consumer-contract references; their evidence remains separately scoped and does not establish semantic equivalence or verifier soundness.
-- [HigherOrderCO/Bend](https://github.com/HigherOrderCO/Bend) at `814453670d0e0d6777c1313c972764dba0491b7f` — Apache-2.0 external reference for a bounded `u24` balanced-reduction conformance profile; no language, compiler, runtime, or benchmark claim transfers.
-- [HigherOrderCO/HVM2](https://github.com/HigherOrderCO/HVM2) at `654276018084b8f44a22b562dd68ab18583bfb5b` — Apache-2.0 external reference for the evaluated CPU runtime cohort; no interaction-net, scheduling, generated-code, or runtime-correctness claim transfers.
-- [rustc-dev-guide: Implicit caller location](https://rustc-dev-guide.rust-lang.org/backend/implicit-caller-location.html) — design reference for finite caller-location metadata and reify-shim behavior only; no rustc implementation or codegen claim transfers.
-- [rustc-dev-guide: Attribute Parsing](https://rustc-dev-guide.rust-lang.org/hir/attribute-parsing.html) — design reference for inert parser classes and policy metadata only; no macro, token-parser, diagnostics, stabilization, or frontend claim transfers.
-- [rustc-dev-guide: Libraries and metadata](https://rustc-dev-guide.rust-lang.org/backend/libs-and-metadata.html) — design reference for rlib/dylib/rmeta capabilities, rustc identity fields, encoded MIR, and pipelining only; no archive, hash-security, linker, LTO, or build-system claim transfers.
-- [OnixResearch/nickel-export](https://github.com/OnixResearch/nickel-export) at `257fafc1c746f1faf156207043a4c826bfb16d49` — exact export, identity, diagnostic, and freshness mechanism; Terrane policy, proof, and release authority do not transfer.
+Third-party material retains its own licensing. In particular, the historical
+Cairn policy and Nickel authoring copies have an
+[exact-blob license grant](cairn-policy/LICENSING.md); Terrane selects MIT for
+those copies and includes the [copyright notice and license](LICENSES/Cairn-MIT.txt).
+See [upstream provenance](cairn-policy/UPSTREAM.md) and the
+[license notices](LICENSES/) for the retained terms. The project license does
+not relicense separate upstream tools or private history.
