@@ -7746,6 +7746,47 @@ r[domain-primitives.typed-config.non-claims]
 Normal-form evidence MUST NOT claim Dhall compatibility, Nickel evaluation,
 parsing, import execution, network or filesystem security, or hash correctness.
 
+## Reclaim Plan
+
+r[reclaim-plan.reachability]
+A node MUST be live exactly when some root reaches it through a finite sequence
+of references.
+
+r[reclaim-plan.admission]
+Planning MUST reject mismatched lengths, inputs over the fixed bounds,
+out-of-range roots or references, and a protected node that references a
+reclaimable node, each with its own class and no plan.
+
+r[reclaim-plan.protected-closure]
+No protected node MAY reference a reclaimable node in an admitted input, and a
+protected node MUST never be a candidate.
+
+r[reclaim-plan.validity]
+A valid plan MUST retain every root, keep retention closed under references,
+and mark as candidates exactly the reclaimable nodes it does not retain. The
+executable checker MUST equal this specification for any plan.
+
+r[reclaim-plan.no-live-candidate]
+No candidate of a valid plan MAY be reachable from any root.
+
+r[reclaim-plan.no-dangling-reference]
+After removing every candidate of a valid plan, no surviving node MAY reference
+a removed node.
+
+r[reclaim-plan.planner]
+A planned result MUST be valid, every non-planned result MUST carry no plan,
+and admissible inputs MUST always plan.
+
+r[reclaim-plan.no-leak]
+Every node a planned result retains MUST be reachable from a root, so every
+unreachable reclaimable node MUST be a candidate.
+
+r[reclaim-plan.evidence]
+Each property MUST have a named proof function and exhaustive small-graph tests
+against an independent oracle. Evidence MUST NOT claim root or reference
+completeness, path-to-index mapping, plan identity, byte totals, or removal
+execution.
+
 ## Fenced Attempt Admission
 
 r[fenced-attempt-admission.boundary]

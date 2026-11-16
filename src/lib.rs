@@ -878,6 +878,9 @@ pub mod rate_limit;
 pub mod rcu;
 pub mod reachability;
 pub mod read_index;
+/// Verified finite reclaim planning over an indexed reference graph.
+#[path = "reclaim_plan/identity.rs"]
+pub mod reclaim_plan;
 pub mod rect_grid_index;
 pub mod ref_count;
 pub mod region;
