@@ -1101,30 +1101,38 @@ proof fn ref_resolved_extend(keys: Seq<Vec<u8>>, refs: Seq<Vec<Vec<u8>>>, a: Seq
     assert(has_edge_spec(b, i, t));
 }
 
-/// Appends one edge per reference of entry `i`, refusing any reference whose
-/// index does not name an entry with the referenced key.
-fn project_row(keys: &Vec<Vec<u8>>, references: &Vec<Vec<Vec<u8>>>, i: usize, index_row: &Vec<usize>, edges: &mut Vec<(usize, usize)>) -> (ok: bool)
+/// Edges after projecting one entry's references, and whether every
+/// reference resolved.
+pub struct RowProjection {
+    pub ok: bool,
+    pub edges: Vec<(usize, usize)>,
+}
+
+/// Appends one edge per reference of entry `i` to `edges`, refusing any
+/// reference whose index does not name an entry with the referenced key.
+fn project_row(keys: &Vec<Vec<u8>>, references: &Vec<Vec<Vec<u8>>>, i: usize, index_row: &Vec<usize>, input: Vec<(usize, usize)>) -> (result: RowProjection)
     requires i < keys.len(), references.len() == keys.len(), index_row.len() == references@[i as int].len(),
-        forall|k: int| #![trigger old(edges)@[k]] 0 <= k < old(edges)@.len() ==> edge_names_ref_spec(keys@, references@, old(edges)@[k]),
+        forall|k: int| #![trigger input@[k]] 0 <= k < input@.len() ==> edge_names_ref_spec(keys@, references@, input@[k]),
     ensures
-        prefix_of_spec(old(edges)@, final(edges)@),
-        forall|k: int| #![trigger final(edges)@[k]] 0 <= k < final(edges)@.len() ==> edge_names_ref_spec(keys@, references@, final(edges)@[k]),
-        ok ==> forall|q: int| #![trigger ref_resolved_spec(keys@, references@, final(edges)@, i as int, q)]
-            0 <= q < references@[i as int].len() ==> ref_resolved_spec(keys@, references@, final(edges)@, i as int, q),
+        prefix_of_spec(input@, result.edges@),
+        forall|k: int| #![trigger result.edges@[k]] 0 <= k < result.edges@.len() ==> edge_names_ref_spec(keys@, references@, result.edges@[k]),
+        result.ok ==> forall|q: int| #![trigger ref_resolved_spec(keys@, references@, result.edges@, i as int, q)]
+            0 <= q < references@[i as int].len() ==> ref_resolved_spec(keys@, references@, result.edges@, i as int, q),
 {
+    let mut edges = input;
     let row = &references[i];
     let mut j: usize = 0;
     while j < row.len()
         invariant 0 <= j <= row.len(), i < keys.len(), references.len() == keys.len(),
             row == references@[i as int], index_row.len() == row.len(),
-            prefix_of_spec(old(edges)@, edges@),
+            prefix_of_spec(input@, edges@),
             forall|k: int| #![trigger edges@[k]] 0 <= k < edges@.len() ==> edge_names_ref_spec(keys@, references@, edges@[k]),
             forall|q: int| #![trigger ref_resolved_spec(keys@, references@, edges@, i as int, q)] 0 <= q < j ==> ref_resolved_spec(keys@, references@, edges@, i as int, q),
         decreases row.len() - j,
     {
         let t = index_row[j];
         if t >= keys.len() || !key_eq(&keys[t], &row[j]) {
-            return false;
+            return RowProjection { ok: false, edges };
         }
         let ghost prev = edges@;
         edges.push((i, t));
@@ -1147,13 +1155,13 @@ fn project_row(keys: &Vec<Vec<u8>>, references: &Vec<Vec<Vec<u8>>>, i: usize, in
                     assert(has_edge_spec(edges@, i as int, t as int));
                 }
             }
-            assert forall|k: int| #![trigger old(edges)@[k]] 0 <= k < old(edges)@.len() implies edges@[k] == old(edges)@[k] by {
-                assert(prev[k] == old(edges)@[k]);
+            assert forall|k: int| #![trigger input@[k]] 0 <= k < input@.len() implies edges@[k] == input@[k] by {
+                assert(prev[k] == input@[k]);
             }
         }
         j = j + 1;
     }
-    true
+    RowProjection { ok: true, edges }
 }
 
 /// A validated projection, or the reason it was refused.
@@ -1207,9 +1215,11 @@ pub fn project_keys(
             return KeyProjection { ok: false, edges: Vec::new() };
         }
         let ghost prev = edges@;
-        if !project_row(keys, references, i, &reference_index[i], &mut edges) {
+        let row = project_row(keys, references, i, &reference_index[i], edges);
+        if !row.ok {
             return KeyProjection { ok: false, edges: Vec::new() };
         }
+        edges = row.edges;
         proof {
             assert forall|a: int, q: int| #![trigger ref_resolved_spec(keys@, references@, edges@, a, q)]
                 0 <= a < i + 1 && 0 <= q < references@[a].len() implies ref_resolved_spec(keys@, references@, edges@, a, q) by {
