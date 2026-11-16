@@ -90,7 +90,7 @@ for every public module.
 | Consensus and distributed coordination | [Quorums](src/quorum.rs), [Raft metadata](src/raft_consensus_core.rs), [fenced attempts](src/fenced_attempt/identity.rs) |
 | Storage and recovery | [WAL recovery](src/wal_recovery.rs), [page checksums](src/page_checksum.rs), [snapshot admission](src/safe_snapshot_replication.rs) |
 | Capabilities and authorization | [Capability decisions](src/authorize.rs), [delegation chains](src/ucan_chain.rs), [caveat evaluation](src/ucan_caveat.rs) |
-| Memory and concurrency | [Allocator metadata](src/alloc_bitmap.rs), [bounded queues](src/bounded_mpmc.rs), [reclamation models](src/safe_reclamation_domain.rs) |
+| Memory and concurrency | [Allocator metadata](src/alloc_bitmap.rs), [bounded queues](src/bounded_mpmc.rs), [reclamation models](src/safe_reclamation_domain.rs), [reclaim planning](src/reclaim_plan/identity.rs) |
 | Compiler analysis | [Control-flow graphs](src/control_flow_graph.rs), [SSA](src/ssa_construction.rs), [instruction selection](src/instruction_selection.rs) |
 | Async and runtime models | [Task lifecycle](src/async_task_state.rs), [wakers](src/task_waker.rs), [one-shot channels](src/oneshot_channel.rs) |
 | Constraint systems | [R1CS rows](src/r1cs_constraint.rs), [gates](src/r1cs_gates.rs), [bounded systems](src/r1cs_system.rs) |
@@ -297,6 +297,7 @@ trusted boundaries, and open issues determine what can be relied on.
 | `dependency_scheduler` | DAG-safe, fair, capacity-bounded job scheduling |
 | `raft_membership_manager` | safe config changes, learner promotion, leadership transfer |
 | `exactly_once_ledger_transfer` | replay-safe balanced transfer posting |
+| `reclaim_plan` | reachability-based reclaim plans: no live or protected candidate, no dangling reference, no leak |
 | `fenced_attempt_admission` | fenced durable-attempt phases, epoch safety, event idempotence, completion linkage, and exact rejection preservation |
 | `sel4_invocation_step` | bounded seL4 invocation transitions preserving invariants |
 | `nix_eval_closure_policy` | Nix/Nickel merge plus reachable closure admission |
@@ -310,6 +311,18 @@ and result linkage. Its caller must establish event classification against
 complete retained history. This kernel does not prove event digest computation,
 history lookup, consumer projection, Mantle runtime equivalence, transport,
 storage, verifier soundness, a Valence property receipt, or release eligibility.
+
+The `reclaim_plan::verified` decision kernel proves specification/executable
+equality for checking a reclaim plan over indexed nodes, references, roots, and
+reclaimable flags: retained is closed under references and contains every root,
+and candidates are exactly the unretained reclaimable nodes. Named proofs show
+that a checked plan never makes a node reachable from a root, or a protected
+node, a candidate, and never leaves a retained node referencing a candidate.
+The bounded fixpoint `plan` is proved to return a checked plan that reclaims
+every unreachable reclaimable node on every admissible input and to reject every
+other input. Its caller must map store paths to indices and supply complete
+roots and references. This kernel does not prove that mapping, root or reference
+completeness, plan identity, or deletion.
 
 ### Core arithmetic and data structures
 

@@ -17,6 +17,7 @@
 ## Phase 3: Evidence and lifecycle
 
 - [x] [serial] I7 Add `docs/requirements.md` entries, the module export, and non-claims. r[reclaim-plan.evidence]
-- [ ] [serial] I8 Add README rows and regenerate the module index and proof catalogs. r[reclaim-plan.evidence]
+- [x] [serial] I8 Add README index rows and the kernel's claim and non-claim paragraph. r[reclaim-plan.evidence]
+- [ ] [serial] I9 Regenerate `docs/module-index.md` and add the invariant catalog, property index, and proof-artifact manifest entries with the repository tools. r[reclaim-plan.evidence]
 - [ ] [serial] V3 Run `./scripts/verus.sh src/lib.rs` with the pinned verifier, Tracey, and the proof-gap inventory; capture transcripts. r[reclaim-plan.evidence]
 - [ ] [serial] V4 Run Cairn validation and the change gates; archive. r[reclaim-plan.evidence]
