@@ -183,8 +183,9 @@ pub proof fn no_live_candidate(
     ensures !live_spec(edges, roots, v),
 {
     if live_spec(edges, roots, v) {
-        let (r, fuel) = choose|r: int, fuel: nat| #![trigger roots[r], reachable_fuel(edges, roots[r] as int, v, fuel)]
-            0 <= r < roots.len() && reachable_fuel(edges, roots[r] as int, v, fuel);
+        let r = choose|r: int| #![trigger roots[r]] 0 <= r < roots.len()
+            && exists|fuel: nat| #![trigger reachable_fuel(edges, roots[r] as int, v, fuel)] reachable_fuel(edges, roots[r] as int, v, fuel);
+        let fuel = choose|fuel: nat| #![trigger reachable_fuel(edges, roots[r] as int, v, fuel)] reachable_fuel(edges, roots[r] as int, v, fuel);
         assert(retained[roots[r] as int]);
         closed_set_contains_reachable(n, edges, retained, roots[r] as int, v, fuel);
         assert(candidate[v] == (reclaimable[v] && !retained[v]));
@@ -341,22 +342,44 @@ pub fn check_plan(
 // ── Counting ────────────────────────────────────────────────────────────
 
 /// Number of retained nodes.
-pub open spec fn count_true(s: Seq<bool>) -> nat
-    decreases s.len(),
+/// The number of `true` entries among the first `k` of `s`.
+pub open spec fn count_true_upto(s: Seq<bool>, k: int) -> nat
+    decreases k,
 {
-    if s.len() == 0 {
+    if k <= 0 {
         0
     } else {
-        (if s[s.len() - 1] { 1nat } else { 0nat }) + count_true(s.subrange(0, s.len() - 1))
+        (if s[k - 1] { 1nat } else { 0nat }) + count_true_upto(s, k - 1)
+    }
+}
+
+pub open spec fn count_true(s: Seq<bool>) -> nat {
+    count_true_upto(s, s.len() as int)
+}
+
+proof fn count_true_upto_bounded(s: Seq<bool>, k: int)
+    requires 0 <= k <= s.len(),
+    ensures count_true_upto(s, k) <= k,
+    decreases k,
+{
+    if k > 0 {
+        count_true_upto_bounded(s, k - 1);
     }
 }
 
 pub proof fn count_true_bounded(s: Seq<bool>)
     ensures count_true(s) <= s.len(),
-    decreases s.len(),
 {
-    if s.len() > 0 {
-        count_true_bounded(s.subrange(0, s.len() - 1));
+    count_true_upto_bounded(s, s.len() as int);
+}
+
+proof fn count_true_upto_set(s: Seq<bool>, i: int, k: int)
+    requires 0 <= i < s.len(), !s[i], 0 <= k <= s.len(),
+    ensures count_true_upto(s.update(i, true), k) == count_true_upto(s, k) + (if i < k { 1nat } else { 0nat }),
+    decreases k,
+{
+    if k > 0 {
+        count_true_upto_set(s, i, k - 1);
     }
 }
 
@@ -364,16 +387,8 @@ pub proof fn count_true_bounded(s: Seq<bool>)
 pub proof fn count_true_set(s: Seq<bool>, i: int)
     requires 0 <= i < s.len(), !s[i],
     ensures count_true(s.update(i, true)) == count_true(s) + 1,
-    decreases s.len(),
 {
-    let t = s.update(i, true);
-    let last = s.len() - 1;
-    if i == last {
-        assert(t.subrange(0, last) =~= s.subrange(0, last));
-    } else {
-        assert(t.subrange(0, last) =~= s.subrange(0, last).update(i, true));
-        count_true_set(s.subrange(0, last), i);
-    }
+    count_true_upto_set(s, i, s.len() as int);
 }
 
 // ── Planner ─────────────────────────────────────────────────────────────
@@ -507,8 +522,9 @@ pub fn plan(n: usize, edges: &Vec<(usize, usize)>, roots: &Vec<usize>, reclaimab
                     assert(e[i as int] == (u, v));
                     assert(has_edge_spec(e, u as int, v as int));
                     assert(live_spec(e, rs, u as int));
-                    let (ro, fuel) = choose|ro: int, fuel: nat| #![trigger rs[ro], reachable_fuel(e, rs[ro] as int, u as int, fuel)]
-                        0 <= ro < rs.len() && reachable_fuel(e, rs[ro] as int, u as int, fuel);
+                    let ro = choose|ro: int| #![trigger rs[ro]] 0 <= ro < rs.len()
+                        && exists|fuel: nat| #![trigger reachable_fuel(e, rs[ro] as int, u as int, fuel)] reachable_fuel(e, rs[ro] as int, u as int, fuel);
+                    let fuel = choose|fuel: nat| #![trigger reachable_fuel(e, rs[ro] as int, u as int, fuel)] reachable_fuel(e, rs[ro] as int, u as int, fuel);
                     reachable_extend(e, rs[ro] as int, u as int, v as int, fuel);
                     assert(reachable_fuel(e, rs[ro] as int, v as int, fuel + 1));
                     assert(live_spec(e, rs, v as int));
@@ -613,8 +629,9 @@ pub proof fn live_mono(
     requires edges_subset_spec(edges, edges2), roots_subset_spec(roots, roots2), live_spec(edges, roots, v),
     ensures live_spec(edges2, roots2, v),
 {
-    let (r, fuel) = choose|r: int, fuel: nat| #![trigger roots[r], reachable_fuel(edges, roots[r] as int, v, fuel)]
-        0 <= r < roots.len() && reachable_fuel(edges, roots[r] as int, v, fuel);
+    let r = choose|r: int| #![trigger roots[r]] 0 <= r < roots.len()
+        && exists|fuel: nat| #![trigger reachable_fuel(edges, roots[r] as int, v, fuel)] reachable_fuel(edges, roots[r] as int, v, fuel);
+    let fuel = choose|fuel: nat| #![trigger reachable_fuel(edges, roots[r] as int, v, fuel)] reachable_fuel(edges, roots[r] as int, v, fuel);
     let s = choose|s: int| #![trigger roots2[s]] 0 <= s < roots2.len() && roots2[s] == roots[r];
     reachable_edges_mono(edges, edges2, roots[r] as int, v, fuel);
     assert(0 <= s < roots2.len() && reachable_fuel(edges2, roots2[s] as int, v, fuel));
@@ -628,8 +645,9 @@ pub proof fn valid_plan_retains_live(
     requires plan_valid_spec(n, edges, roots, reclaimable, retained, candidate), live_spec(edges, roots, v),
     ensures retained[v],
 {
-    let (r, fuel) = choose|r: int, fuel: nat| #![trigger roots[r], reachable_fuel(edges, roots[r] as int, v, fuel)]
-        0 <= r < roots.len() && reachable_fuel(edges, roots[r] as int, v, fuel);
+    let r = choose|r: int| #![trigger roots[r]] 0 <= r < roots.len()
+        && exists|fuel: nat| #![trigger reachable_fuel(edges, roots[r] as int, v, fuel)] reachable_fuel(edges, roots[r] as int, v, fuel);
+    let fuel = choose|fuel: nat| #![trigger reachable_fuel(edges, roots[r] as int, v, fuel)] reachable_fuel(edges, roots[r] as int, v, fuel);
     assert(retained[roots[r] as int]);
     closed_set_contains_reachable(n, edges, retained, roots[r] as int, v, fuel);
 }
@@ -834,12 +852,6 @@ pub proof fn sorted_keys_distinct(keys: Seq<Vec<u8>>, i: int, j: int)
     }
 }
 
-/// Entry `i` names `b` among its references.
-pub open spec fn key_has_ref_spec(keys: Seq<Vec<u8>>, refs: Seq<Vec<Vec<u8>>>, a: Seq<u8>, b: Seq<u8>) -> bool {
-    exists|i: int, j: int| #![trigger keys[i], refs[i][j]]
-        0 <= i < keys.len() && i < refs.len() && keys[i]@ == a && 0 <= j < refs[i].len() && refs[i][j]@ == b
-}
-
 /// `b` is reachable from `a` over keys in at most `fuel` reference steps.
 pub open spec fn key_reach_fuel(keys: Seq<Vec<u8>>, refs: Seq<Vec<Vec<u8>>>, a: Seq<u8>, b: Seq<u8>, fuel: nat) -> bool
     decreases fuel,
@@ -849,8 +861,9 @@ pub open spec fn key_reach_fuel(keys: Seq<Vec<u8>>, refs: Seq<Vec<Vec<u8>>>, a: 
     } else if fuel == 0 {
         false
     } else {
-        exists|mid: Seq<u8>| #![trigger key_has_ref_spec(keys, refs, a, mid)]
-            key_has_ref_spec(keys, refs, a, mid) && key_reach_fuel(keys, refs, mid, b, (fuel - 1) as nat)
+        exists|i: int, j: int| #![trigger keys[i], refs[i][j]]
+            0 <= i < keys.len() && i < refs.len() && keys[i]@ == a && 0 <= j < refs[i].len()
+            && key_reach_fuel(keys, refs, refs[i][j]@, b, (fuel - 1) as nat)
     }
 }
 
@@ -903,10 +916,10 @@ pub proof fn index_reach_implies_key_reach(
         assert(edge_names_ref_spec(keys, refs, edges[k]));
         let j = choose|j: int| #![trigger refs[edges[k].0 as int][j]]
             0 <= j < refs[edges[k].0 as int].len() && refs[edges[k].0 as int][j]@ == keys[edges[k].1 as int]@;
-        assert(key_has_ref_spec(keys, refs, keys[s]@, keys[mid]@)) by {
+        index_reach_implies_key_reach(keys, refs, edges, mid, t, (fuel - 1) as nat);
+        assert(refs[s][j]@ == keys[mid]@ && key_reach_fuel(keys, refs, refs[s][j]@, keys[t]@, (fuel - 1) as nat)) by {
             assert(keys[s] == keys[edges[k].0 as int] && refs[s][j] == refs[edges[k].0 as int][j]);
         }
-        index_reach_implies_key_reach(keys, refs, edges, mid, t, (fuel - 1) as nat);
     }
 }
 
@@ -923,10 +936,9 @@ pub proof fn key_reach_implies_index_reach(
         assert(reachable_fuel(edges, s, s, fuel));
         s
     } else {
-        let mid = choose|mid: Seq<u8>| #![trigger key_has_ref_spec(keys, refs, keys[s]@, mid)]
-            key_has_ref_spec(keys, refs, keys[s]@, mid) && key_reach_fuel(keys, refs, mid, b, (fuel - 1) as nat);
-        let (i, j) = choose|i: int, j: int| #![trigger keys[i], refs[i][j]]
-            0 <= i < keys.len() && i < refs.len() && keys[i]@ == keys[s]@ && 0 <= j < refs[i].len() && refs[i][j]@ == mid;
+        let i = choose|i: int| #![trigger keys[i]] 0 <= i < keys.len() && i < refs.len() && keys[i]@ == keys[s]@
+            && exists|j: int| #![trigger refs[i][j]] 0 <= j < refs[i].len() && key_reach_fuel(keys, refs, refs[i][j]@, b, (fuel - 1) as nat);
+        let j = choose|j: int| #![trigger refs[i][j]] 0 <= j < refs[i].len() && key_reach_fuel(keys, refs, refs[i][j]@, b, (fuel - 1) as nat);
         sorted_keys_distinct(keys, i, s);
         assert(ref_resolved_spec(keys, refs, edges, i, j));
         let m = choose|t: int| #![trigger keys[t]] 0 <= t < keys.len() && keys[t]@ == refs[i][j]@ && has_edge_spec(edges, i, t);
@@ -947,14 +959,16 @@ pub proof fn key_live_matches_index_live(
     ensures live_spec(edges, roots, v) == key_live_spec(keys, refs, root_keys, keys[v]@),
 {
     if live_spec(edges, roots, v) {
-        let (r, fuel) = choose|r: int, fuel: nat| #![trigger roots[r], reachable_fuel(edges, roots[r] as int, v, fuel)]
-            0 <= r < roots.len() && reachable_fuel(edges, roots[r] as int, v, fuel);
+        let r = choose|r: int| #![trigger roots[r]] 0 <= r < roots.len()
+            && exists|fuel: nat| #![trigger reachable_fuel(edges, roots[r] as int, v, fuel)] reachable_fuel(edges, roots[r] as int, v, fuel);
+        let fuel = choose|fuel: nat| #![trigger reachable_fuel(edges, roots[r] as int, v, fuel)] reachable_fuel(edges, roots[r] as int, v, fuel);
         index_reach_implies_key_reach(keys, refs, edges, roots[r] as int, v, fuel);
         assert(key_reach_fuel(keys, refs, root_keys[r]@, keys[v]@, fuel));
     }
     if key_live_spec(keys, refs, root_keys, keys[v]@) {
-        let (r, fuel) = choose|r: int, fuel: nat| #![trigger root_keys[r], key_reach_fuel(keys, refs, root_keys[r]@, keys[v]@, fuel)]
-            0 <= r < root_keys.len() && key_reach_fuel(keys, refs, root_keys[r]@, keys[v]@, fuel);
+        let r = choose|r: int| #![trigger root_keys[r]] 0 <= r < root_keys.len()
+            && exists|fuel: nat| #![trigger key_reach_fuel(keys, refs, root_keys[r]@, keys[v]@, fuel)] key_reach_fuel(keys, refs, root_keys[r]@, keys[v]@, fuel);
+        let fuel = choose|fuel: nat| #![trigger key_reach_fuel(keys, refs, root_keys[r]@, keys[v]@, fuel)] key_reach_fuel(keys, refs, root_keys[r]@, keys[v]@, fuel);
         assert(keys[roots[r] as int]@ == root_keys[r]@);
         let t = key_reach_implies_index_reach(keys, refs, edges, roots[r] as int, keys[v]@, fuel);
         sorted_keys_distinct(keys, t, v);
@@ -983,11 +997,17 @@ fn key_lt(a: &Vec<u8>, b: &Vec<u8>) -> (lt: bool)
     ensures lt == key_lt_spec(a@, b@),
 {
     let mut i: usize = 0;
-    while i < a.len() && i < b.len() && a[i] == b[i]
+    let mut same = true;
+    while same && i < a.len() && i < b.len()
         invariant 0 <= i <= a.len(), i <= b.len(), prefix_eq_spec(a@, b@, i as int),
-        decreases a.len() - i,
+            !same ==> i < a.len() && i < b.len() && a@[i as int] != b@[i as int],
+        decreases a.len() - i + (if same { 1int } else { 0int }),
     {
-        i = i + 1;
+        if a[i] == b[i] {
+            i = i + 1;
+        } else {
+            same = false;
+        }
     }
     let lt = (i == a.len() && i < b.len()) || (i < a.len() && i < b.len() && a[i] < b[i]);
     proof {
