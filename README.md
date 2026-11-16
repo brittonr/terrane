@@ -322,9 +322,13 @@ The bounded fixpoint `plan` is proved to return a checked plan that reclaims
 every unreachable reclaimable node on every admissible input and to reject every
 other input. A planned result is the least valid plan and therefore unique, more
 roots, references, or protection never add a candidate, and reordering or
-duplicating roots and references does not change it. Its caller must map store paths to indices and supply complete
-roots and references. This kernel does not prove that mapping, root or reference
-completeness, plan identity, or deletion.
+duplicating roots and references does not change it. `project_keys` and
+`key_mask` validate a caller's mapping from byte-string keys to indices, so the
+same safety holds over keys: no listed candidate key is reachable from a root
+key, and every reachable key is listed as retained. Its caller must supply
+complete roots and references and pass each entry's key, references, and flag
+together. This kernel does not prove root or reference completeness, plan
+identity, or deletion.
 
 ### Core arithmetic and data structures
 

@@ -7798,11 +7798,19 @@ r[reclaim-plan.set-invariance]
 Reordering or duplicating roots or references, within the fixed bounds, MUST
 NOT change whether a plan is valid or whether it retains only live nodes.
 
+r[reclaim-plan.key-projection]
+A consumer's mapping from byte-string keys to indices MUST be validated, not
+trusted: keys MUST be strictly sorted, and every reference and root index MUST
+name the entry whose key equals the referenced bytes, or the projection MUST be
+refused. Plan path lists MUST be validated the same way. Under a validated
+projection, no listed candidate key MAY be reachable from a root key, and every
+key reachable from a root key MUST be listed as retained.
+
 r[reclaim-plan.evidence]
 Each property MUST have a named proof function and exhaustive small-graph tests
 against an independent oracle. Evidence MUST NOT claim root or reference
-completeness, path-to-index mapping, plan identity, byte totals, or removal
-execution.
+completeness, that each entry's key, references, and flag are passed together,
+plan identity, byte totals, or removal execution.
 
 ## Fenced Attempt Admission
 

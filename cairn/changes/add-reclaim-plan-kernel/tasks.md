@@ -11,11 +11,13 @@
 
 - [x] [serial] I10 Prove `planned_result_retains_exactly_live`, `planned_result_is_least_valid_plan`, and `planned_results_are_unique`, with `valid_plan_retains_live`. r[reclaim-plan.exact-retention] r[reclaim-plan.least-plan]
 - [x] [serial] I11 Prove `stronger_input_never_adds_candidates` and `planned_result_depends_only_on_sets`, with `reachable_edges_mono` and `live_mono`; show each hypothesis is needed by removing it. r[reclaim-plan.monotone] r[reclaim-plan.set-invariance]
+- [x] [serial] I12 Add `project_keys` and `key_mask`, which validate a consumer's key-to-index mapping and plan path lists, with the lexicographic order lemmas, and prove `key_live_matches_index_live`, `no_listed_candidate_path_is_live`, and `every_live_path_is_listed_retained`; show each hypothesis and each runtime check is needed by removing it. r[reclaim-plan.key-projection]
 
 ## Phase 2: Tests
 
 - [x] [parallel] V1 Add positive and negative tests, including corrupted plans. r[reclaim-plan.validity] r[reclaim-plan.admission]
 - [x] [parallel] V2 Add an exhaustive test over every graph, root set, and reclaimable set with up to three nodes against an independent oracle. r[reclaim-plan.evidence]
+- [x] [parallel] V6 Add an exhaustive keyed-graph test against the breadth-first oracle and negative tests for wrong, out-of-range, unsorted, duplicate, and mis-shaped mappings and masks. r[reclaim-plan.key-projection]
 - [x] [parallel] V5 Add exhaustive tests that the planned result is the least of all 27,437 valid plans, that adding a root, reference, or protection never adds a candidate, and that reordering and duplicating inputs keep the plan. r[reclaim-plan.least-plan] r[reclaim-plan.monotone] r[reclaim-plan.set-invariance]
 
 ## Phase 3: Evidence and lifecycle

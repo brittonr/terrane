@@ -48,6 +48,16 @@ r[reclaim-plan.exact-retention] A planned result MUST retain exactly the live no
 - **WHEN** a consumer sorts and deduplicates both before checking
 - **THEN** the same retained and candidate sets MUST remain valid and sound
 
+### Requirement: Validated key projection
+
+r[reclaim-plan.key-projection] A consumer's key-to-index mapping and plan path lists MUST be validated against the keys' bytes, with unsorted or duplicate keys and any unresolved or mismatched index refused, and the safety theorems MUST then hold over keys.
+
+#### Scenario: Consumer maps a reference to the wrong entry
+
+- **GIVEN** a reference index that names an entry whose key differs from the referenced bytes
+- **WHEN** the projection is validated
+- **THEN** it MUST be refused
+
 ### Requirement: Evidence and non-claims
 
 r[reclaim-plan.evidence] Each property MUST have a named proof function and exhaustive small-graph tests, with explicit non-claims for root and reference completeness, path mapping, plan identity, byte totals, and removal execution.
