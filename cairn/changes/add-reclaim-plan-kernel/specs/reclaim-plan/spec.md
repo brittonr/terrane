@@ -32,6 +32,22 @@ r[reclaim-plan.planner] A planned result MUST be valid per r[reclaim-plan.validi
 - **WHEN** planning succeeds
 - **THEN** the node MUST be a candidate
 
+### Requirement: Optimal, deterministic, monotone planning
+
+r[reclaim-plan.exact-retention] A planned result MUST retain exactly the live nodes. r[reclaim-plan.least-plan] It MUST be the least valid plan for its input, and any two planned results for the same input MUST be equal. r[reclaim-plan.monotone] Adding roots or references, or protecting more nodes, MUST NOT add a candidate. r[reclaim-plan.set-invariance] Reordering or duplicating roots or references within the bounds MUST NOT change validity or soundness.
+
+#### Scenario: Root added between planning and execution
+
+- **GIVEN** a planned result for some roots
+- **WHEN** a root is added and any valid plan is made for the new input
+- **THEN** every candidate of the new plan MUST be a candidate of the original planned result
+
+#### Scenario: Consumer deduplicates references
+
+- **GIVEN** a planned result for some roots and references
+- **WHEN** a consumer sorts and deduplicates both before checking
+- **THEN** the same retained and candidate sets MUST remain valid and sound
+
 ### Requirement: Evidence and non-claims
 
 r[reclaim-plan.evidence] Each property MUST have a named proof function and exhaustive small-graph tests, with explicit non-claims for root and reference completeness, path mapping, plan identity, byte totals, and removal execution.

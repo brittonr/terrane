@@ -9,10 +9,14 @@
 - [x] [serial] I5 Add the fixpoint `plan` with a round cap and prove planned results valid and sound; prove `planned_result_reclaims_every_unreachable_node`. r[reclaim-plan.planner] r[reclaim-plan.no-leak]
 - [x] [serial] I6 Prove with `count_true_set` and `count_true_bounded` that the planner never reaches its round cap, so admissible inputs always plan. r[reclaim-plan.planner]
 
+- [x] [serial] I10 Prove `planned_result_retains_exactly_live`, `planned_result_is_least_valid_plan`, and `planned_results_are_unique`, with `valid_plan_retains_live`. r[reclaim-plan.exact-retention] r[reclaim-plan.least-plan]
+- [x] [serial] I11 Prove `stronger_input_never_adds_candidates` and `planned_result_depends_only_on_sets`, with `reachable_edges_mono` and `live_mono`; show each hypothesis is needed by removing it. r[reclaim-plan.monotone] r[reclaim-plan.set-invariance]
+
 ## Phase 2: Tests
 
 - [x] [parallel] V1 Add positive and negative tests, including corrupted plans. r[reclaim-plan.validity] r[reclaim-plan.admission]
 - [x] [parallel] V2 Add an exhaustive test over every graph, root set, and reclaimable set with up to three nodes against an independent oracle. r[reclaim-plan.evidence]
+- [x] [parallel] V5 Add exhaustive tests that the planned result is the least of all 27,437 valid plans, that adding a root, reference, or protection never adds a candidate, and that reordering and duplicating inputs keep the plan. r[reclaim-plan.least-plan] r[reclaim-plan.monotone] r[reclaim-plan.set-invariance]
 
 ## Phase 3: Evidence and lifecycle
 

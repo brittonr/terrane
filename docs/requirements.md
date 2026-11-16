@@ -7781,6 +7781,23 @@ r[reclaim-plan.no-leak]
 Every node a planned result retains MUST be reachable from a root, so every
 unreachable reclaimable node MUST be a candidate.
 
+r[reclaim-plan.exact-retention]
+A planned result MUST retain exactly the nodes reachable from a root, and its
+candidates MUST be exactly the reclaimable nodes no root reaches.
+
+r[reclaim-plan.least-plan]
+A planned result MUST retain no node that some other valid plan for the same
+input does not retain, and MUST reclaim every node any valid plan reclaims.
+Any two planned results for the same input MUST be equal.
+
+r[reclaim-plan.monotone]
+Adding roots or references, or protecting more nodes, MUST NOT make any node a
+candidate that the planned result for the original input does not reclaim.
+
+r[reclaim-plan.set-invariance]
+Reordering or duplicating roots or references, within the fixed bounds, MUST
+NOT change whether a plan is valid or whether it retains only live nodes.
+
 r[reclaim-plan.evidence]
 Each property MUST have a named proof function and exhaustive small-graph tests
 against an independent oracle. Evidence MUST NOT claim root or reference

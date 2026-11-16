@@ -320,7 +320,9 @@ that a checked plan never makes a node reachable from a root, or a protected
 node, a candidate, and never leaves a retained node referencing a candidate.
 The bounded fixpoint `plan` is proved to return a checked plan that reclaims
 every unreachable reclaimable node on every admissible input and to reject every
-other input. Its caller must map store paths to indices and supply complete
+other input. A planned result is the least valid plan and therefore unique, more
+roots, references, or protection never add a candidate, and reordering or
+duplicating roots and references does not change it. Its caller must map store paths to indices and supply complete
 roots and references. This kernel does not prove that mapping, root or reference
 completeness, plan identity, or deletion.
 
