@@ -2,8 +2,8 @@
 
 ## Phase 1: Reviewed specification
 
-- [ ] [serial] Record Tracey `uncovered` and `untested` before the move, then add `.cairn/specs/bounds/spec.md` with the unchanged `bounds.in-range` and `bounds.clamp` text, replace the `docs/requirements.md` block with a pointer, and add the spec to the Tracey include. r[trellis.convergence_pilot.reviewed_spec]
-- [ ] [serial] Rerun Tracey `uncovered` and `untested` and record that the requirement IDs and coverage counts are unchanged. r[trellis.convergence_pilot.reviewed_spec]
+- [x] [serial] Record Tracey `uncovered` and `untested` before the move, then add `.cairn/specs/bounds/spec.md` with the unchanged `bounds.in-range` and `bounds.clamp` text, replace the `docs/requirements.md` block with a pointer, and add the spec to the Tracey include. r[trellis.convergence_pilot.reviewed_spec]
+- [x] [serial] Rerun Tracey `uncovered` and `untested` and record that the requirement IDs and coverage counts are unchanged. r[trellis.convergence_pilot.reviewed_spec]
 
 ## Phase 2: Producer job contract and derivation
 
