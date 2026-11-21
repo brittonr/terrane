@@ -1,0 +1,56 @@
+{
+  "contracts": [
+    {
+      "assumptions": [],
+      "contract_id": "trellis.requirements.bounds",
+      "exclusions": [],
+      "non_claims": [
+        "evaluates supplied reviewed contracts and evidence only; does not authenticate reviewers or producers, prove verifier soundness, or establish whole-program correctness",
+        "does not prove Rust caller preconditions",
+        "does not prove Verus or Z3 soundness",
+        "does not prove that the u64 model matches machine arithmetic beyond Verus's model",
+        "does not establish release eligibility"
+      ],
+      "specification": {
+        "blake3": "b3800b8fee7352fc83cd98a3386325a8fe2d45c1d2b4385434461027c199291c",
+        "path": ".cairn/specs/bounds/spec.md"
+      },
+      "targets": [
+        {
+          "assurance": "checked_proof",
+          "checked_scope": [
+            "trellis.bounds.verus#rail-0"
+          ],
+          "claim": "For the exact `src/lib.rs` and `src/bounds.rs` bytes bound by the job, Verus verifies that `bounds::clamp` returns `lo` when `value < lo`, `hi` when `value > hi`, and `value` otherwise, and that its result satisfies `in_range_spec(result, lo, hi)` whenever `lo <= hi`.",
+          "evidence_classes": [
+            "proof_card"
+          ],
+          "evidence_ids": [
+            "trellis.bounds.verus#rail-0"
+          ],
+          "evidence_job": {
+            "definition": "proof-rails/verus-bounds/mantle-job.ncl",
+            "job_id": "trellis.bounds.verus.mantle.v1"
+          },
+          "informal_remainder": "The requirement prose does not constrain behavior when `lo > hi`; the exec function requires `lo <= hi` and is not callable outside that precondition. The target does not prove that Rust callers respect the precondition, does not prove Verus or Z3 soundness, and does not prove that the `u64` model matches machine arithmetic beyond Verus's model. The checked Verus run covers all of `src/lib.rs`, which is larger than this bounds claim.",
+          "negative_controls": [],
+          "provider": "verus-v1-compatibility",
+          "requirement": {
+            "requirement_body_blake3": "29b0e86db1211657c578b2e447133841058b588d448365dba8555b4f9e3300eb",
+            "requirement_id": "bounds.clamp",
+            "row_blake3": "b7db99df29a5865823e6c261453a6a1d4877fb89d54784d6c84d0ecd0d789c23",
+            "source_span": {
+              "end_byte": 1126,
+              "end_line": 40,
+              "start_byte": 974,
+              "start_line": 37
+            },
+            "specification_blake3": "b3800b8fee7352fc83cd98a3386325a8fe2d45c1d2b4385434461027c199291c",
+            "specification_path": ".cairn/specs/bounds/spec.md"
+          }
+        }
+      ]
+    }
+  ],
+  "schema_version": "cairn.assurance-targets.v1"
+}
