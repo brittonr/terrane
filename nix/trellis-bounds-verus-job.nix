@@ -8,6 +8,7 @@
 , profileJson
 , providerSource
 , providerJson
+, specification
 , producer
 , envelope
 , cargoToml
@@ -65,6 +66,8 @@ pkgs.runCommand "trellis-bounds-verus-job" {
   cp ${flakeLock} "$out/flake.lock"
   cp ${profileJson} "$out/profile.json"
   cp ${providerJson} "$out/provider-profile.json"
+  mkdir -p "$out/.cairn/specs/bounds"
+  cp ${specification} "$out/.cairn/specs/bounds/spec.md"
 
   printf '%s' ${pkgs.lib.escapeShellArg sourceRevision} \
     | grep -Eq '^[0-9a-f]{40}$' \
@@ -166,7 +169,7 @@ pkgs.runCommand "trellis-bounds-verus-job" {
 
   stage=required-outputs
   bash ${gatesScript} required-outputs "$out" \
-    job.json profile.json provider-profile.json source/src/lib.rs source/src/bounds.rs \
+    job.json profile.json provider-profile.json .cairn/specs/bounds/spec.md source/src/lib.rs source/src/bounds.rs \
     source-revision flake.lock artifacts/verus.stdout artifacts/verus.stderr \
     artifacts/verus.command artifacts/streams.json artifacts/build-context.json \
     verus-receipt.json producer-report.json formal-proof-envelope.json \

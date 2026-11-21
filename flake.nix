@@ -271,6 +271,7 @@ EOF
           profileJson = ./proof-rails/verus-bounds/generated/profile.json;
           providerSource = ./proof-rails/verus-bounds/provider-profile.ncl;
           providerJson = ./proof-rails/verus-bounds/generated/provider-profile.json;
+          specification = ./.cairn/specs/bounds/spec.md;
           cargoToml = ./Cargo.toml;
           cargoLock = ./Cargo.lock;
           rustToolchainFile = ./rust-toolchain.toml;
@@ -1265,6 +1266,7 @@ EOF
           trellis-verus-producer = trellisVerusProducer;
           trellis-verus-envelope = trellisVerusEnvelope;
           cairn-convergence = cairn-convergence.packages.${system}.cairn;
+          octet-judge = inputs.octet-judge.packages.${system}.cargo-octet;
         };
 
         checks = {

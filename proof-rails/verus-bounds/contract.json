@@ -41,7 +41,7 @@
       "statement": "For the exact `src/lib.rs` and `src/bounds.rs` bytes bound by the job, Verus verifies that `bounds::clamp` returns `lo` when `value < lo`, `hi` when `value > hi`, and `value` otherwise, and that its result satisfies `in_range_spec(result, lo, hi)` whenever `lo <= hi`."
     }
   ],
-  "contract_id": "trellis.requirements.bounds",
+  "contract_id": "trellis.bounds.verus",
   "exclusions": [],
   "non_claims": [
     "evaluates supplied reviewed contracts and evidence only; does not authenticate reviewers or producers, prove verifier soundness, or establish whole-program correctness",

@@ -149,6 +149,10 @@ fn dedup(values: impl IntoIterator<Item = String>) -> Vec<String> {
     ordered
 }
 
+fn plain(identity: &str) -> &str {
+    identity.strip_prefix("b3:").unwrap_or(identity)
+}
+
 fn artifact(path: &str, blake3: String, bytes: u64, truncated: bool) -> serde_json::Value {
     serde_json::json!({
         "locator": path,
@@ -512,9 +516,9 @@ fn expected(root: &Path) -> Result<Expected, String> {
         "solver_summary": observed.build.pointer("/solver").cloned().unwrap_or_default(),
         "receipt_path": "verus-receipt.json",
         "artifact_blake3_identities": [
-            { "artifact": text(&stdout, "/locator")?, "blake3": text(&stdout, "/blake3")? },
-            { "artifact": text(&stderr, "/locator")?, "blake3": text(&stderr, "/blake3")? },
-            { "artifact": text(&command, "/locator")?, "blake3": text(&command, "/blake3")? },
+            { "artifact": text(&stdout, "/locator")?, "blake3": plain(text(&stdout, "/blake3")?) },
+            { "artifact": text(&stderr, "/locator")?, "blake3": plain(text(&stderr, "/blake3")?) },
+            { "artifact": text(&command, "/locator")?, "blake3": plain(text(&command, "/blake3")?) },
         ],
         "status": "passed",
         "evidence_tier": "formal_proof",
@@ -528,7 +532,7 @@ fn expected(root: &Path) -> Result<Expected, String> {
         "contract_blake3": serde_json::Value::Null,
         "source_snapshot": profile_source_paths
             .iter()
-            .map(|(path, blake3)| serde_json::json!({ "locator": path, "blake3": blake3 }))
+            .map(|(path, blake3)| serde_json::json!({ "locator": path, "blake3": plain(blake3) }))
             .collect::<Vec<_>>(),
         "proof_decks": [{
             "evidence_id": rail_id,
@@ -830,6 +834,14 @@ jq -s '{schema_version:"octet-formal-proof-envelope/v1", provider_id:"not-verus"
         assert_eq!(text(&receipt, "/checked_scope").unwrap(), "trellis.bounds.verus#rail-0");
         let cards = read_json(&fixture.path("proof-cards.json")).expect("cards");
         assert_eq!(text(&cards, "/cards/0/evidence_tier").unwrap(), "formal_proof");
+        for identity in cards.pointer("/cards/0/artifact_blake3_identities").unwrap().as_array().unwrap() {
+            let digest = text(identity, "/blake3").unwrap();
+            assert!(!digest.starts_with("b3:"), "card digests must be plain BLAKE3 hex");
+        }
+        let evidence = read_json(&fixture.path("evidence.json")).expect("evidence");
+        for binding in evidence.pointer("/source_snapshot").unwrap().as_array().unwrap() {
+            assert!(!text(binding, "/blake3").unwrap().starts_with("b3:"));
+        }
         assert_eq!(
             text(&cards, "/cards/0/formal_proof_envelope/provider_id").unwrap(),
             VERUS_PROVIDER_ID

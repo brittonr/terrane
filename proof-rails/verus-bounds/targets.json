@@ -2,7 +2,7 @@
   "contracts": [
     {
       "assumptions": [],
-      "contract_id": "trellis.requirements.bounds",
+      "contract_id": "trellis.bounds.verus",
       "exclusions": [],
       "non_claims": [
         "evaluates supplied reviewed contracts and evidence only; does not authenticate reviewers or producers, prove verifier soundness, or establish whole-program correctness",

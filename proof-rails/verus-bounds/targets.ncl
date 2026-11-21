@@ -15,7 +15,7 @@ let spec = Cairn.specification_from_registry registry "bounds.clamp" in
   schema_version = "cairn.assurance-targets.v1",
   contracts = [
     {
-      contract_id = "trellis.requirements.bounds",
+      contract_id = "trellis.bounds.verus",
       specification = spec,
       targets = [
         {
