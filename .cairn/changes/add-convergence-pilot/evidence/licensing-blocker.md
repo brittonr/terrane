@@ -32,3 +32,14 @@ D-J says to treat the material as MIT OR Apache-2.0 and to stop and report if
 Cairn's current licensing differs for these paths. Cairn's written boundary
 does not name either path, and its catch-all assigns unmarked repository
 material AGPL-3.0-or-later. The import was not performed.
+
+## Resolution
+
+Britton approved the grant added at Cairn
+`830b5446bca69497d34ba65b22d8833927e3b5da`: `docs/licensing.md` now has
+`| `contracts/**` and `cairn-policy/assurance-targets.ncl` |
+`MIT OR Apache-2.0`, at every revision and for byte-for-byte copies |`, and
+`cairn-policy/LICENSING.md` has the "Consumer contracts and assurance-targets
+policy offer" section. WP8.3 imported the two files from that revision under
+that grant; `cairn-policy/UPSTREAM.md` and `cairn-policy/LICENSING.md` record
+the row, section, blob IDs and SHA-256 values.
