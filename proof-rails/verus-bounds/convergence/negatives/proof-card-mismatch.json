@@ -1,0 +1,16 @@
+{
+  "binding_check": "proof card mismatch",
+  "mutation": {
+    "op": "json-set",
+    "file": "producer-output/5hqkrl54nhfa44nmmaf80phvyi5kvjz1-trellis-bounds-verus-job/proof-cards.json",
+    "pointer": "/cards/0/artifact_blake3_identities/0/blake3",
+    "value": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.proof_card_receipt_mismatch"
+    ]
+  }
+}

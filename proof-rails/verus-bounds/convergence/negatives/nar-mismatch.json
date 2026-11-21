@@ -1,0 +1,16 @@
+{
+  "binding_check": "nar mismatch",
+  "mutation": {
+    "op": "json-set",
+    "file": "store-info.json",
+    "pointer": "/paths/0/nar_sha256",
+    "value": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.nar_mismatch"
+    ]
+  }
+}

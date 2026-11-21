@@ -1,0 +1,16 @@
+{
+  "binding_check": "realization output mismatch",
+  "mutation": {
+    "op": "json-set",
+    "file": "realization-receipt.json",
+    "pointer": "/units/7523/outputs/0/target_path",
+    "value": "/nix/store/00000000000000000000000000000000-trellis-bounds-verus-job"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.realization_output_mismatch"
+    ]
+  }
+}

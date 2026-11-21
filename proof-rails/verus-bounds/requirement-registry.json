@@ -4,7 +4,7 @@
   "repository_id": "onixresearch/terrane",
   "revision": {
     "kind": "git",
-    "value": "a143be37c7e56f2d3d66ce9d947f025585d66064"
+    "value": "e8a961af3dbeb6f7a0f7dfbf82100bfe2abcb482"
   },
   "specification_set_blake3": "57e85cb752900d7b9178a7c9d1fe6f6e5e3faffed24e277985f137803e091278",
   "specifications": [
@@ -21342,13 +21342,13 @@
     "not implementation correctness",
     "not release eligibility"
   ],
-  "registry_blake3": "0a48527ee9034ef3e0ade1755cb8137d7b90772c5e647aaa4eeca1071d7f73e7",
+  "registry_blake3": "3de55f2a792cfafbdbd5b70ef05884cab8d6724da79e77c89bae68983474e47c",
   "receipt": {
     "schema_version": "cairn.content-bound-requirement-registry-receipt.v1",
-    "registry_blake3": "0a48527ee9034ef3e0ade1755cb8137d7b90772c5e647aaa4eeca1071d7f73e7",
+    "registry_blake3": "3de55f2a792cfafbdbd5b70ef05884cab8d6724da79e77c89bae68983474e47c",
     "repository_id": "onixresearch/terrane",
     "revision_kind": "git",
-    "revision": "a143be37c7e56f2d3d66ce9d947f025585d66064",
+    "revision": "e8a961af3dbeb6f7a0f7dfbf82100bfe2abcb482",
     "specification_set_blake3": "57e85cb752900d7b9178a7c9d1fe6f6e5e3faffed24e277985f137803e091278",
     "policy_blake3": "c7598fe42de72f9f04b13c951fafc989be186f11db64c484534bca5b3a1bf254",
     "row_count": 1603,
@@ -21359,6 +21359,6 @@
       "not implementation correctness",
       "not release eligibility"
     ],
-    "receipt_blake3": "87deae51ff134c1d0d424e78b7b9a7fa851ae264b6f6fcc7f43d69ceafbf7c76"
+    "receipt_blake3": "5fb98df79d8f587c2feaf159a7c8b9d07b832c83a31ae01850e700b2532f0244"
   }
 }

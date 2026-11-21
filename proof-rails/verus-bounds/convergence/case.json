@@ -1,0 +1,20 @@
+{
+  "schema_version": "cairn.convergence-case.v1",
+  "registry": "requirement-registry.json",
+  "targets": "targets.json",
+  "generated_sources": "generated.json",
+  "trusted_signers": ["wp8-20261121-1"],
+  "contracts": [
+    {
+      "contract_id": "trellis.bounds.verus",
+      "contract": "contract.json",
+      "decision": "decision.json",
+      "evidence": "evidence.json",
+      "handoff": "handoff",
+      "producer_output": "producer-output/5hqkrl54nhfa44nmmaf80phvyi5kvjz1-trellis-bounds-verus-job",
+      "producer_output_locator": "/datapool/mantle-store/wp8-20261121/store-preserve-2/5hqkrl54nhfa44nmmaf80phvyi5kvjz1-trellis-bounds-verus-job",
+      "realization_receipt": "realization-receipt.json",
+      "store_info": "store-info.json"
+    }
+  ]
+}

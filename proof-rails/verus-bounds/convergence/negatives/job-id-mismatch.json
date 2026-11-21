@@ -1,0 +1,17 @@
+{
+  "binding_check": "job id mismatch",
+  "mutation": {
+    "op": "json-set",
+    "file": "handoff/job.json",
+    "pointer": "/job_id",
+    "value": "trellis.bounds.verus.mantle.v2"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.job_id_mismatch",
+      "convergence.producer_job_identity_mismatch"
+    ]
+  }
+}

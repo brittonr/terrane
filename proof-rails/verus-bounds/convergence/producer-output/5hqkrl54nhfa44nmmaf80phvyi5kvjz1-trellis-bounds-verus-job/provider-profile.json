@@ -1,0 +1,23 @@
+{
+  "network_allowed": false,
+  "non_claims": [
+    "The provider profile names pinned labels; it does not prove Z3 or Verus soundness",
+    "Exact verifier and solver digests are recorded per run in the receipt, not in this static record"
+  ],
+  "producer_id": "trellis.bounds.verus.mantle.v1",
+  "rust_toolchain": {
+    "bundled_with_verus": true,
+    "channel": "1.99.1",
+    "manifest": "nix/verus.nix"
+  },
+  "schema_version": "trellis-verus-provider-profile/v1",
+  "verus": {
+    "binary": "terrane-verus",
+    "derivation": "nix/verus.nix",
+    "version": "0.2026.10.18.7d82994"
+  },
+  "z3": {
+    "binary": "z3",
+    "bundled_with_verus": true
+  }
+}

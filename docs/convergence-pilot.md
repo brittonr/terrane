@@ -29,6 +29,12 @@ evidence, card and provider negatives.
 
 ## Convergence case
 
+The case's evidence bundle carries the contract file's BLAKE3 in
+`contract_blake3`, which Cairn requires the evidence to bind. The inspected
+receipt is saved as `convergence/receipt.json`; the per-binding negative
+records live in `convergence/negatives/` and run through
+`check-convergence-negatives.py`.
+
 `proof-rails/verus-bounds/convergence/case.json` binds the registry at the
 producer source revision, the targets and generated source record, the Octet
 contract, decision and evidence, the Mantle bridge handoff, the producer output

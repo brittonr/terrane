@@ -1,0 +1,16 @@
+{
+  "binding_check": "producer receipt mismatch",
+  "mutation": {
+    "op": "replace-bytes",
+    "file": "producer-output/5hqkrl54nhfa44nmmaf80phvyi5kvjz1-trellis-bounds-verus-job/external-receipt.json",
+    "find": "octet-verus-proof-receipt/v1",
+    "replace": "octet-verus-proof-receipt/v2"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.producer_receipt_mismatch"
+    ]
+  }
+}

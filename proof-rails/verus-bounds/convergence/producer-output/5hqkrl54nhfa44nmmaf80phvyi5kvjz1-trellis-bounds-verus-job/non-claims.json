@@ -1,0 +1,19 @@
+{
+  "job_id": "trellis.bounds.verus.mantle.v1",
+  "non_claims": [
+    "Nix evaluation supplies a frozen ordinary derivation graph; it is not theorem admission",
+    "The report is a Trellis-owned record, not an external acceptance decision",
+    "Mantle realizes and signs build outputs, not proof truth or external acceptance policy",
+    "A cached producer output preserves its recorded external acceptance; cache reuse is not a fresh verifier execution",
+    "The recursive tool graph includes declared bootstrap/binary acquisition inputs and does not claim seed-free bootstrap",
+    "Not whole-crate correctness: the claim is scoped to the bounds module and the declared rail",
+    "Not verifier or solver soundness",
+    "Not theorem admission or release eligibility",
+    "The checked run covers all of source/src/lib.rs, which is larger than the scoped claim",
+    "The provider profile names pinned labels; it does not prove Z3 or Verus soundness",
+    "Exact verifier and solver digests are recorded per run in the receipt, not in this static record",
+    "The receipt records a passing verifier run over the listed source bytes; it is not theorem admission",
+    "Mantle and Cairn perform their own bindings and judgment over these bytes"
+  ],
+  "schema_version": "trellis-verus-non-claims/v1"
+}

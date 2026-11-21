@@ -1,0 +1,28 @@
+{
+  "entries": [
+    {
+      "artifact_hashes": [],
+      "policy_ids": [],
+      "requirement_id": "bounds.clamp",
+      "source_ids": [],
+      "sources": [
+        {
+          "blake3": "4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676",
+          "locator": "source/src/lib.rs"
+        },
+        {
+          "blake3": "c81448f07814bbbdd99b70b8e40df6c3d1cafe8ecfbda8a4d57f6609e2ffe561",
+          "locator": "source/src/bounds.rs"
+        }
+      ],
+      "tool_identity_hashes": []
+    }
+  ],
+  "schema_version": "cairn.assurance-target-sources.v1",
+  "specifications": [
+    {
+      "blake3": "144326dfd67a6ef9b2f4851afb5f9ed45e0d0daf539efad0ccb4a999d829fb47",
+      "path": ".cairn/specs/bounds/spec.md"
+    }
+  ]
+}

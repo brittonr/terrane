@@ -1,0 +1,16 @@
+{
+  "binding_check": "root unit mismatch",
+  "mutation": {
+    "op": "json-set",
+    "file": "realization-receipt.json",
+    "pointer": "/units/7523/node_id",
+    "value": "nix:00000000000000000000000000000000-trellis-bounds-verus-job.drv"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.realization_derivation_mismatch"
+    ]
+  }
+}

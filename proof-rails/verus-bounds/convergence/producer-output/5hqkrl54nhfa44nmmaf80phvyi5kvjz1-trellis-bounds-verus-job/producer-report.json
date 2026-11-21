@@ -1,0 +1,111 @@
+{
+  "artifacts": [
+    {
+      "blake3": "b3:01e42191ded4b13d14b260cf54d62dbc76d246761d75a80b7c27f71a8b9633f7",
+      "bytes": 48,
+      "locator": "artifacts/verus.stdout",
+      "role": "verus.stdout",
+      "truncated": false
+    },
+    {
+      "blake3": "b3:0ded8b79dbdbf6450f95f960d6b7c45c3a57d63666349c7e725a9ff8e892bdbc",
+      "bytes": 35759,
+      "locator": "artifacts/verus.stderr",
+      "role": "verus.stderr",
+      "truncated": false
+    },
+    {
+      "blake3": "b3:a860414dea6be23448f1216f52abc783e92e238de281bffd757e8e3b0f02a25e",
+      "bytes": 836,
+      "locator": "artifacts/verus.command",
+      "role": "verus.command",
+      "truncated": false
+    }
+  ],
+  "checked_scope": "trellis.bounds.verus#rail-0",
+  "command_argv": [
+    "terrane-verus",
+    "--triggers-mode",
+    "silent",
+    "--rlimit",
+    "20",
+    "--crate-type=lib",
+    "--extern",
+    "vstd=/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994/libexec/verus/libvstd.rlib",
+    "--extern",
+    "verus_builtin=/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994/libexec/verus/libverus_builtin.rlib",
+    "--extern",
+    "verus_builtin_macros=/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994/libexec/verus/libverus_builtin_macros.so",
+    "--extern",
+    "verus_state_machines_macros=/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994/libexec/verus/libverus_state_machines_macros.so",
+    "-L",
+    "/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994/libexec/verus",
+    "--edition",
+    "2024",
+    "/nix/store/5hqkrl54nhfa44nmmaf80phvyi5kvjz1-trellis-bounds-verus-job/source/src/lib.rs"
+  ],
+  "command_blake3": "b3:a860414dea6be23448f1216f52abc783e92e238de281bffd757e8e3b0f02a25e",
+  "exit_code": 0,
+  "job_id": "trellis.bounds.verus.mantle.v1",
+  "job_identity": "b3:387008d0189b305a08613a375c91f603c8c7dbd6fd09b9ce69eb8d227d9b4ab4",
+  "limits": {
+    "cores": 8,
+    "stderr_max_bytes": 1048576,
+    "stdout_max_bytes": 1048576,
+    "timeout_ms": 1800000
+  },
+  "non_claims": [
+    "Nix evaluation supplies a frozen ordinary derivation graph; it is not theorem admission",
+    "The report is a Trellis-owned record, not an external acceptance decision",
+    "Mantle realizes and signs build outputs, not proof truth or external acceptance policy",
+    "A cached producer output preserves its recorded external acceptance; cache reuse is not a fresh verifier execution",
+    "The recursive tool graph includes declared bootstrap/binary acquisition inputs and does not claim seed-free bootstrap",
+    "Not whole-crate correctness: the claim is scoped to the bounds module and the declared rail",
+    "Not verifier or solver soundness",
+    "Not theorem admission or release eligibility",
+    "The checked run covers all of source/src/lib.rs, which is larger than the scoped claim",
+    "The provider profile names pinned labels; it does not prove Z3 or Verus soundness",
+    "Exact verifier and solver digests are recorded per run in the receipt, not in this static record",
+    "The receipt records a passing verifier run over the listed source bytes; it is not theorem admission",
+    "Mantle and Cairn perform their own bindings and judgment over these bytes"
+  ],
+  "owner": "Trellis",
+  "pass_signal": "0 errors",
+  "policy_id": "trellis.bounds.verus",
+  "profile_identity": "b3:fe5b1e55df944133734a28d5fda5abe065b569b74d24d6b0c59c8e9942192e70",
+  "provider_profile_identity": "b3:ff95cfcf82c969e36b960e9cfb193e24dd593c1525ed4e4e47a0046316bf81f1",
+  "rail_id": "trellis.bounds.verus#rail-0",
+  "rail_index": 0,
+  "schema_version": "trellis-verus-producer-report/v1",
+  "source_bindings": [
+    {
+      "blake3": "b3:4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676",
+      "path": "src/lib.rs"
+    },
+    {
+      "blake3": "b3:c81448f07814bbbdd99b70b8e40df6c3d1cafe8ecfbda8a4d57f6609e2ffe561",
+      "path": "src/bounds.rs"
+    }
+  ],
+  "source_revision": "e8a961af3dbeb6f7a0f7dfbf82100bfe2abcb482",
+  "status": "passed",
+  "tool_identities": {
+    "solver": {
+      "solver_digest": "b3:cdf09653128625dca079e3abf4c8934075f405e71d3e832eeeb84ac4b34503b2",
+      "solver_id": "z3"
+    },
+    "toolchain": {
+      "toolchain_digest": "b3:91ca02fc7fc1587117a2509f3dcf4500299df42f21c8029e5f397cf3c25dbf5b",
+      "toolchain_id": "1.99.1-x86_64-unknown-linux-gnu"
+    },
+    "verifier": {
+      "verifier_binary_digest": "b3:40854ff5015bf0ee66cbe88169730c94d8e67b2dca32dadd0651cdd81fe6b9ab",
+      "verifier_binary_path": "/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994/libexec/verus/rust_verify",
+      "verifier_digest": "b3:5c53106e0ea2ce3e15c3570d15f95859775f6320714ffc31765e7ffb51e456bd",
+      "verifier_id": "terrane-verus",
+      "verifier_nix_closure": "/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994",
+      "verifier_nix_closure_digest": "b3:e7294da94c96254a5cd9dc9285eefa04bdc0e3ee2eb4ca95164dc68438b28543",
+      "verifier_nix_closure_graph_digest": ""
+    }
+  }
+}
