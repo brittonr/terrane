@@ -29,3 +29,10 @@
 
 - [ ] [serial] Vendor the Cairn assurance-targets contract and policy with recorded provenance. r[trellis.convergence_pilot.freeze]
 - [ ] [serial] Add the second Cairn input, registry export and targets, Octet judgment, Mantle realization, and the convergence case. r[trellis.convergence_pilot.producer_job]
+
+## Phase 6: Stage 2 convergence inputs
+
+- [x] [serial] Add the `cairn-convergence` input at Cairn `ffb14c68` and expose `packages.x86_64-linux.cairn-convergence`, leaving the legacy `cairn` pin unchanged. r[trellis.convergence_pilot.freeze]
+- [ ] [serial] Vendor the R_C assurance-targets contract and policy with recorded Git blobs and license admission. r[trellis.convergence_pilot.reviewed_spec]
+- [ ] [serial] Export `requirement-registry.json` at a committed revision and author `targets.ncl`, `contract.ncl`, `generated.ncl` and their JSON with the vendored helpers. r[trellis.convergence_pilot.producer_job]
+- [ ] [serial] Record the WP8.3 licensing blocker and resolve it before importing the R_C Nickel files. r[trellis.convergence_pilot.reviewed_spec]
