@@ -1,0 +1,16 @@
+{
+  "binding_check": "tool graph changed",
+  "mutation": {
+    "op": "replace-bytes",
+    "file": "handoff/tool-closure.derivation-json.json",
+    "find": "\"derivations\"",
+    "replace": "\"derivationT\""
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.tool_graph_identity_mismatch"
+    ]
+  }
+}

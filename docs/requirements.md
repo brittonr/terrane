@@ -60,13 +60,9 @@ MUST return 0. The divisor MUST be nonzero.
 
 ## Bounds
 
-r[bounds.in-range]
-The in-range predicate MUST return true if and only if the value is
-within the inclusive range [lo, hi].
-
-r[bounds.clamp]
-Clamp MUST return lo when value < lo, hi when value > hi, and value
-otherwise. The result MUST always satisfy in-range(result, lo, hi).
+The `bounds.in-range` and `bounds.clamp` requirements are specified in
+[`.cairn/specs/bounds/spec.md`](../.cairn/specs/bounds/spec.md). The Cairn
+specification is the only normative copy.
 
 ## Collections
 

@@ -11,7 +11,7 @@ and stores old + addend.
 ## Requirements
 
 ### Requirement: Return Semantics
-r[bounds.in-range]
+r[fetch-add.semantics]
 
 FAA MUST return the value that was in the cell before the addition and
 store the sum in the cell.
@@ -46,7 +46,7 @@ FAA with addend zero MUST be a no-op.
 - THEN the returned value is `c` and the new cell content is `c`
 
 ### Requirement: Commutativity
-r[fetch-add.associativity]
+r[fetch-add.commutativity]
 
 Two sequential FAAs MUST produce the same final cell value regardless of
 the order the addends are applied.

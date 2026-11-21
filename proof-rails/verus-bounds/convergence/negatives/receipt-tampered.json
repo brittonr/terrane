@@ -1,0 +1,17 @@
+{
+  "binding_check": "receipt tampered",
+  "mutation": {
+    "op": "replace-bytes",
+    "file": "handoff/external-receipt.json",
+    "find": "octet-verus-proof-receipt/v1",
+    "replace": "octet-verus-proof-receipt/v2"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.receipt_identity_mismatch",
+      "convergence.producer_receipt_mismatch"
+    ]
+  }
+}

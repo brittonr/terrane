@@ -1,0 +1,16 @@
+{
+  "binding_check": "stale row",
+  "mutation": {
+    "op": "json-set",
+    "file": "targets.json",
+    "pointer": "/contracts/0/targets/0/requirement/row_blake3",
+    "value": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.stale_row"
+    ]
+  }
+}

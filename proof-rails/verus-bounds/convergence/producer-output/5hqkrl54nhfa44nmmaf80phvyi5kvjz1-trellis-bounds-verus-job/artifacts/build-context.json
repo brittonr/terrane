@@ -1,0 +1,22 @@
+{
+  "schema_version": "trellis-verus-build-context/v1",
+  "exit_code": 0,
+  "package_lock_blake3": "b3:3afbf5286a4e71280cf9b939406095d156c5a579a83240d4b2c346bd91c7d96a",
+  "verifier": {
+    "verifier_id": "terrane-verus",
+    "verifier_digest": "b3:5c53106e0ea2ce3e15c3570d15f95859775f6320714ffc31765e7ffb51e456bd",
+    "verifier_binary_path": "/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994/libexec/verus/rust_verify",
+    "verifier_binary_digest": "b3:40854ff5015bf0ee66cbe88169730c94d8e67b2dca32dadd0651cdd81fe6b9ab",
+    "verifier_nix_closure": "/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994",
+    "verifier_nix_closure_digest": "b3:e7294da94c96254a5cd9dc9285eefa04bdc0e3ee2eb4ca95164dc68438b28543",
+    "verifier_nix_closure_graph_digest": ""
+  },
+  "toolchain": {
+    "toolchain_id": "1.99.1-x86_64-unknown-linux-gnu",
+    "toolchain_digest": "b3:91ca02fc7fc1587117a2509f3dcf4500299df42f21c8029e5f397cf3c25dbf5b"
+  },
+  "solver": {
+    "solver_id": "z3",
+    "solver_digest": "b3:cdf09653128625dca079e3abf4c8934075f405e71d3e832eeeb84ac4b34503b2"
+  }
+}

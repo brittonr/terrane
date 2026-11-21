@@ -10,7 +10,7 @@ correctness.
 ## Requirements
 
 ### Requirement: Lattice Properties
-r[constfold.finite-height]
+r[constfold.lattice]
 
 The constant propagation lattice MUST satisfy bounded lattice axioms.
 
@@ -50,7 +50,7 @@ The lattice MUST have bounded height so iteration terminates.
 - THEN it is at most 2 (Top → Const → Bottom)
 
 ### Requirement: Transfer Function Monotonicity
-r[chain.collision-free]
+r[constfold.monotone]
 
 The transfer function MUST be monotone with respect to the lattice ordering.
 

@@ -1,0 +1,108 @@
+{
+  "execution": {
+    "artifact_verify_argv": [
+      "trellis-verus-producer",
+      "verify",
+      "--root",
+      "$OUT",
+      "--format",
+      "json"
+    ],
+    "command_argv": [
+      "terrane-verus",
+      "--triggers-mode",
+      "silent",
+      "--rlimit",
+      "20",
+      "--crate-type=lib",
+      "--extern",
+      "vstd=$VERUS_ROOT/libvstd.rlib",
+      "--extern",
+      "verus_builtin=$VERUS_ROOT/libverus_builtin.rlib",
+      "--extern",
+      "verus_builtin_macros=$VERUS_ROOT/libverus_builtin_macros.so",
+      "--extern",
+      "verus_state_machines_macros=$VERUS_ROOT/libverus_state_machines_macros.so",
+      "-L",
+      "$VERUS_ROOT",
+      "--edition",
+      "2024",
+      "source/src/lib.rs"
+    ],
+    "network_allowed": false,
+    "rail_id": "trellis.bounds.verus#rail-0"
+  },
+  "job_id": "trellis.bounds.verus.mantle.v1",
+  "limits": {
+    "cores": 8,
+    "stderr_max_bytes": 1048576,
+    "stdout_max_bytes": 1048576,
+    "timeout_ms": 1800000
+  },
+  "non_claims": [
+    "Nix evaluation supplies a frozen ordinary derivation graph; it is not theorem admission",
+    "The report is a Trellis-owned record, not an external acceptance decision",
+    "Mantle realizes and signs build outputs, not proof truth or external acceptance policy",
+    "A cached producer output preserves its recorded external acceptance; cache reuse is not a fresh verifier execution",
+    "The recursive tool graph includes declared bootstrap/binary acquisition inputs and does not claim seed-free bootstrap"
+  ],
+  "outputs": [
+    "job.json",
+    "source",
+    "source-revision",
+    "flake.lock",
+    "artifacts",
+    "artifacts/verus.stdout",
+    "artifacts/verus.stderr",
+    "artifacts/verus.command",
+    "producer-report.json",
+    "verus-receipt.json",
+    "formal-proof-envelope.json",
+    "proof-cards.json",
+    "evidence.json",
+    "profile.json",
+    "provider-profile.json",
+    "non-claims.json"
+  ],
+  "owner": "Trellis",
+  "package_attribute": "packages.x86_64-linux.trellis-bounds-verus-job",
+  "profile": {
+    "identity": "b3:fe5b1e55df944133734a28d5fda5abe065b569b74d24d6b0c59c8e9942192e70",
+    "path": "proof-rails/verus-bounds/generated/profile.json"
+  },
+  "provider": {
+    "identity": "b3:ff95cfcf82c969e36b960e9cfb193e24dd593c1525ed4e4e47a0046316bf81f1",
+    "path": "proof-rails/verus-bounds/generated/provider-profile.json"
+  },
+  "schema_version": "trellis-mantle-producer-job/v1",
+  "source": {
+    "network_allowed": false,
+    "paths": [
+      "src/lib.rs",
+      "src/bounds.rs",
+      "Cargo.toml",
+      "Cargo.lock",
+      "rust-toolchain.toml"
+    ],
+    "root": "src"
+  },
+  "system": "x86_64-linux",
+  "tools": {
+    "closure_format": "nix-derivation-show-recursive-json; preserve raw bytes and flake.lock; legacy uses absolute inputDrvs/inputSrcs, v4 uses basename derivations and inputs.drvs/inputs.srcs with explicit version 4",
+    "dependencies": [
+      "terrane-verus",
+      "trellis-verus-producer",
+      "trellis-verus-envelope",
+      "flakes:verus",
+      "flakes:rust-toolchain",
+      "flake.lock:nixpkgs",
+      "flake.lock:nixpkgs:stdenv.cc",
+      "flake.lock:octet-judge"
+    ],
+    "graph_formats": [
+      "nix-derivation-show-legacy",
+      "nix-derivation-show-v4"
+    ],
+    "solver": "z3 bundled with the pinned Verus release"
+  }
+}

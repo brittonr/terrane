@@ -1,0 +1,58 @@
+{
+  "assumptions": [],
+  "clauses": [
+    {
+      "allowed_evidence_ids": [
+        "trellis.bounds.verus#rail-0"
+      ],
+      "allowed_source_requirement_ids": [
+        "bounds.clamp"
+      ],
+      "checked_scope": [
+        "trellis.bounds.verus#rail-0"
+      ],
+      "clause_id": "bounds.clamp",
+      "disposition": "formal_proof",
+      "expected_evidence_tier": "formal_proof",
+      "required": true,
+      "required_bindings": {
+        "artifact_hashes": [],
+        "checked_scope": [],
+        "evidence_tier": "formal_proof",
+        "policy_ids": [],
+        "source_ids": [],
+        "tool_identity_hashes": []
+      },
+      "required_evidence_classes": [
+        "proof_card"
+      ],
+      "required_negative_controls": [],
+      "required_provider_id": "verus-v1-compatibility",
+      "source_bindings": [
+        {
+          "blake3": "4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676",
+          "locator": "source/src/lib.rs"
+        },
+        {
+          "blake3": "c81448f07814bbbdd99b70b8e40df6c3d1cafe8ecfbda8a4d57f6609e2ffe561",
+          "locator": "source/src/bounds.rs"
+        }
+      ],
+      "statement": "For the exact `src/lib.rs` and `src/bounds.rs` bytes bound by the job, Verus verifies that `bounds::clamp` returns `lo` when `value < lo`, `hi` when `value > hi`, and `value` otherwise, and that its result satisfies `in_range_spec(result, lo, hi)` whenever `lo <= hi`."
+    }
+  ],
+  "contract_id": "trellis.bounds.verus",
+  "exclusions": [],
+  "non_claims": [
+    "evaluates supplied reviewed contracts and evidence only; does not authenticate reviewers or producers, prove verifier soundness, or establish whole-program correctness",
+    "does not prove Rust caller preconditions",
+    "does not prove Verus or Z3 soundness",
+    "does not prove that the u64 model matches machine arithmetic beyond Verus's model",
+    "does not establish release eligibility"
+  ],
+  "reviewed_specification": {
+    "blake3": "144326dfd67a6ef9b2f4851afb5f9ed45e0d0daf539efad0ccb4a999d829fb47",
+    "path": ".cairn/specs/bounds/spec.md"
+  },
+  "schema_version": "octet-requirement-contract/v1"
+}

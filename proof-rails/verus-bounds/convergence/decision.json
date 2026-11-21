@@ -1,0 +1,46 @@
+{
+  "schema_version": "octet-requirement-decision/v1",
+  "contract_id": "trellis.bounds.verus",
+  "contract_blake3": "c901f153c43137da203ee84b8b5631e02bf999b835f6d41dd72123ea0a062b38",
+  "evidence_blake3": "9b7582c6df3d8deb3ac83b397b6c3ea793bc91c8b82e7def4d5ad151ba64d33c",
+  "source_snapshot_blake3": "50b0cc1105d6bd1efdb34d56817538f5a8eb6bdaff87f56ebaff4792616e16b9",
+  "reviewed_specification": {
+    "path": ".cairn/specs/bounds/spec.md",
+    "blake3": "144326dfd67a6ef9b2f4851afb5f9ed45e0d0daf539efad0ccb4a999d829fb47"
+  },
+  "aggregate_result": "passed",
+  "clauses": [
+    {
+      "clause_id": "bounds.clamp",
+      "required": true,
+      "disposition": "formal_proof",
+      "status": "passed",
+      "evidence_ids": [
+        "trellis.bounds.verus#rail-0"
+      ],
+      "source_bindings": [
+        {
+          "locator": "source/src/lib.rs",
+          "blake3": "4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676"
+        },
+        {
+          "locator": "source/src/bounds.rs",
+          "blake3": "c81448f07814bbbdd99b70b8e40df6c3d1cafe8ecfbda8a4d57f6609e2ffe561"
+        }
+      ],
+      "diagnostics": []
+    }
+  ],
+  "assumptions": [],
+  "exclusions": [],
+  "limitations": [],
+  "diagnostics": [],
+  "non_claims": [
+    "does not establish release eligibility",
+    "does not prove Rust caller preconditions",
+    "does not prove Verus or Z3 soundness",
+    "does not prove that the u64 model matches machine arithmetic beyond Verus's model",
+    "evaluates supplied reviewed contracts and evidence only; does not authenticate reviewers or producers, prove verifier soundness, or establish whole-program correctness"
+  ],
+  "decision_blake3": "aaa7f5a47a9b2fe68681d3f9eb6e8381bc1f33d27ead4e26622a15fad4992819"
+}

@@ -28,7 +28,7 @@ stream and MUST NOT target instruction 0.
 - THEN validation fails
 
 ### Requirement: Instruction Partition
-r[cache-partition.assignment]
+r[control-flow-graph.partition]
 
 Every instruction MUST belong to exactly one basic block, and blocks
 MUST partition the instruction sequence.
@@ -117,7 +117,7 @@ predecessors from within the function for valid instruction streams.
 - THEN the list is empty
 
 ### Requirement: Exit Block
-r[liveness.exit]
+r[control-flow-graph.exit-block]
 
 Exit blocks MUST end with return instructions and have no successors.
 

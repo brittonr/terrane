@@ -1,0 +1,27 @@
+{
+  "specifications": [
+    {
+      "path": ".cairn/specs/bounds/spec.md",
+      "blake3": "144326dfd67a6ef9b2f4851afb5f9ed45e0d0daf539efad0ccb4a999d829fb47"
+    }
+  ],
+  "entries": [
+    {
+      "requirement_id": "bounds.clamp",
+      "sources": [
+        {
+          "locator": "source/src/lib.rs",
+          "blake3": "4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676"
+        },
+        {
+          "locator": "source/src/bounds.rs",
+          "blake3": "c81448f07814bbbdd99b70b8e40df6c3d1cafe8ecfbda8a4d57f6609e2ffe561"
+        }
+      ],
+      "source_ids": [],
+      "policy_ids": [],
+      "tool_identity_hashes": [],
+      "artifact_hashes": []
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": "octet-formal-proof-envelope/v1",
+  "provider_id": "verus-v1-compatibility",
+  "policy_id": "trellis.bounds.verus",
+  "rail_id": "trellis.bounds.verus#rail-0",
+  "checked_scope": "trellis.bounds.verus#rail-0",
+  "status": "passed",
+  "evidence_tier": "formal_proof",
+  "claim": {
+    "theorem_or_property_id": "trellis.bounds.verus#rail-0",
+    "requirement_id": "trellis.bounds.verus",
+    "claim_class": "verus-v1-compatibility"
+  },
+  "package_lock_identity": "b3:3afbf5286a4e71280cf9b939406095d156c5a579a83240d4b2c346bd91c7d96a",
+  "source_bindings": [
+    {
+      "locator": "src/lib.rs",
+      "blake3": "b3:4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676"
+    },
+    {
+      "locator": "src/bounds.rs",
+      "blake3": "b3:c81448f07814bbbdd99b70b8e40df6c3d1cafe8ecfbda8a4d57f6609e2ffe561"
+    }
+  ],
+  "artifact_identities": [
+    {
+      "locator": "artifacts/verus.stdout",
+      "blake3": "b3:01e42191ded4b13d14b260cf54d62dbc76d246761d75a80b7c27f71a8b9633f7"
+    },
+    {
+      "locator": "artifacts/verus.stderr",
+      "blake3": "b3:0ded8b79dbdbf6450f95f960d6b7c45c3a57d63666349c7e725a9ff8e892bdbc"
+    }
+  ],
+  "trust_boundaries": [
+    "Verus and the bundled Z3 solver are trusted verifier components; the receipt records their identity, not their soundness",
+    "The Rust/Verus semantics model of u64 arithmetic is trusted"
+  ],
+  "non_claims": [
+    "Nix evaluation supplies a frozen ordinary derivation graph; it is not theorem admission",
+    "The report is a Trellis-owned record, not an external acceptance decision",
+    "Mantle realizes and signs build outputs, not proof truth or external acceptance policy",
+    "A cached producer output preserves its recorded external acceptance; cache reuse is not a fresh verifier execution",
+    "The recursive tool graph includes declared bootstrap/binary acquisition inputs and does not claim seed-free bootstrap",
+    "Not whole-crate correctness: the claim is scoped to the bounds module and the declared rail",
+    "Not verifier or solver soundness",
+    "Not theorem admission or release eligibility",
+    "The checked run covers all of source/src/lib.rs, which is larger than the scoped claim",
+    "The provider profile names pinned labels; it does not prove Z3 or Verus soundness",
+    "Exact verifier and solver digests are recorded per run in the receipt, not in this static record",
+    "The receipt records a passing verifier run over the listed source bytes; it is not theorem admission",
+    "Mantle and Cairn perform their own bindings and judgment over these bytes"
+  ],
+  "provider": {
+    "kind": "verus-v1",
+    "payload": {
+      "receipt": {
+        "schema_version": "octet-verus-proof-receipt/v1",
+        "policy_id": "trellis.bounds.verus",
+        "rail_index": 0,
+        "backend": "verus",
+        "verifier_mode": "production",
+        "producer_id": "trellis.bounds.verus.mantle.v1",
+        "checker_id": "trellis-verus-producer",
+        "package_lock_blake3": "b3:3afbf5286a4e71280cf9b939406095d156c5a579a83240d4b2c346bd91c7d96a",
+        "verifier_identity": {
+          "verifier_id": "terrane-verus",
+          "verifier_digest": "b3:5c53106e0ea2ce3e15c3570d15f95859775f6320714ffc31765e7ffb51e456bd",
+          "verifier_binary_path": "/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994/libexec/verus/rust_verify",
+          "verifier_binary_digest": "b3:40854ff5015bf0ee66cbe88169730c94d8e67b2dca32dadd0651cdd81fe6b9ab",
+          "verifier_nix_closure": "/nix/store/p72j1v14s37w7v91gfi03svh54d6ccwi-terrane-verus-0.2026.10.18.7d82994",
+          "verifier_nix_closure_digest": "b3:e7294da94c96254a5cd9dc9285eefa04bdc0e3ee2eb4ca95164dc68438b28543",
+          "verifier_nix_closure_graph_digest": ""
+        },
+        "toolchain_identity": {
+          "toolchain_id": "1.99.1-x86_64-unknown-linux-gnu",
+          "toolchain_digest": "b3:91ca02fc7fc1587117a2509f3dcf4500299df42f21c8029e5f397cf3c25dbf5b"
+        },
+        "solver_identity": {
+          "solver_id": "z3",
+          "solver_digest": "b3:cdf09653128625dca079e3abf4c8934075f405e71d3e832eeeb84ac4b34503b2"
+        },
+        "command_blake3": "b3:a860414dea6be23448f1216f52abc783e92e238de281bffd757e8e3b0f02a25e",
+        "source_bindings": [
+          {
+            "path": "src/lib.rs",
+            "blake3": "b3:4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676"
+          },
+          {
+            "path": "src/bounds.rs",
+            "blake3": "b3:c81448f07814bbbdd99b70b8e40df6c3d1cafe8ecfbda8a4d57f6609e2ffe561"
+          }
+        ],
+        "proof_bindings": [],
+        "trust_boundaries": [
+          "Verus and the bundled Z3 solver are trusted verifier components; the receipt records their identity, not their soundness",
+          "The Rust/Verus semantics model of u64 arithmetic is trusted"
+        ],
+        "checked_scope": "trellis.bounds.verus#rail-0",
+        "status": "passed",
+        "pass_signal": "0 errors",
+        "proof_artifact_identity": "artifacts/verus.command#b3:a860414dea6be23448f1216f52abc783e92e238de281bffd757e8e3b0f02a25e",
+        "stdout_artifact": {
+          "locator": "artifacts/verus.stdout",
+          "blake3": "b3:01e42191ded4b13d14b260cf54d62dbc76d246761d75a80b7c27f71a8b9633f7",
+          "bytes": 48,
+          "truncated": false
+        },
+        "stderr_artifact": {
+          "locator": "artifacts/verus.stderr",
+          "blake3": "b3:0ded8b79dbdbf6450f95f960d6b7c45c3a57d63666349c7e725a9ff8e892bdbc",
+          "bytes": 35759,
+          "truncated": false
+        },
+        "non_claims": [
+          "Nix evaluation supplies a frozen ordinary derivation graph; it is not theorem admission",
+          "The report is a Trellis-owned record, not an external acceptance decision",
+          "Mantle realizes and signs build outputs, not proof truth or external acceptance policy",
+          "A cached producer output preserves its recorded external acceptance; cache reuse is not a fresh verifier execution",
+          "The recursive tool graph includes declared bootstrap/binary acquisition inputs and does not claim seed-free bootstrap",
+          "Not whole-crate correctness: the claim is scoped to the bounds module and the declared rail",
+          "Not verifier or solver soundness",
+          "Not theorem admission or release eligibility",
+          "The checked run covers all of source/src/lib.rs, which is larger than the scoped claim",
+          "The provider profile names pinned labels; it does not prove Z3 or Verus soundness",
+          "Exact verifier and solver digests are recorded per run in the receipt, not in this static record",
+          "The receipt records a passing verifier run over the listed source bytes; it is not theorem admission",
+          "Mantle and Cairn perform their own bindings and judgment over these bytes"
+        ]
+      }
+    }
+  }
+}

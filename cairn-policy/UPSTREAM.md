@@ -123,3 +123,37 @@ from the pinned Cairn revision still requires access to Cairn's private Git
 history and separately identified toolchain; the blobs bundled here remain
 locally inspectable. The grant does not establish chain of title, source
 correctness, policy soundness, or release eligibility.
+
+## Assurance-targets contract and policy
+
+A second admitted Cairn revision supplies the consumer-facing
+assurance-targets material. At Cairn
+`830b5446bca69497d34ba65b22d8833927e3b5da`, `docs/licensing.md` grants
+`contracts/**` and `cairn-policy/assurance-targets.ncl` as
+`MIT OR Apache-2.0`, at every revision and for byte-for-byte copies, and
+`cairn-policy/LICENSING.md` states the same offer in its
+"Consumer contracts and assurance-targets policy offer" section. Terrane
+vendors them under distinct local names:
+
+| Cairn path at `830b544` | Git blob | SHA-256 | Terrane copy |
+|---|---|---|---|
+| `contracts/assurance-targets.ncl` | `d9cb31625176e940aa4240774dab6fe22a7085ce` | `08bb2f6aee2f5336585cb8fb7224c601fed1bbe1b5cf5f4a264e57162b3318ab` | `assurance-targets-contract.ncl` |
+| `cairn-policy/assurance-targets.ncl` | `ee45346022a2956dcabd52fd7876fbba615b2b81` | `54c2eb0a43d6ab46301a29cfe207b1ed687d742f5d5f2e1761475f69befb24f2` | `assurance-targets-policy.ncl` |
+
+The license texts are copies from the same revision:
+`LICENSES/MIT.txt` (`90052e6d8eb3f1a55bfeeac933ef977ba3cd6ec1`,
+SHA-256 `f3b8b374507146478f8fd429f654de692ef166e31647a325742d995a4da701a3`)
+and `LICENSES/Apache-2.0.txt`
+(`d645695673349e3947e8e5ae42332d0ac3164cd7`,
+SHA-256 `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`).
+
+`cairn-policy/SHA256SUMS` records the vendored assurance files together with
+the historical Nickel inputs and the immutable base projection. Check both
+admitted revisions from Terrane's root with:
+
+```sh
+python3 cairn-policy/sync-cairn-source.py --upstream ../cairn
+```
+
+The `b6759012db4dab0158936e995b7bad39ac10465b` record above is unchanged;
+neither its negotiated grant nor its byte-identical copies move.

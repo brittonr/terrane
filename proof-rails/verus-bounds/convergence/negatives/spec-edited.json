@@ -1,0 +1,17 @@
+{
+  "binding_check": "spec edited",
+  "mutation": {
+    "op": "root-replace-bytes",
+    "file": ".cairn/specs/bounds/spec.md",
+    "find": "The result MUST always satisfy",
+    "replace": "The result MUST always satisfx"
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "stale",
+    "issues": [
+      "convergence.registry_unverified",
+      "convergence.reviewed_specification_stale"
+    ]
+  }
+}

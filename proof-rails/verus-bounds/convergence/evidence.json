@@ -1,0 +1,39 @@
+{
+  "assumption_records": [],
+  "contract_blake3": "c901f153c43137da203ee84b8b5631e02bf999b835f6d41dd72123ea0a062b38",
+  "contract_id": "trellis.bounds.verus",
+  "empirical_checks": [],
+  "non_claims": [
+    "Nix evaluation supplies a frozen ordinary derivation graph; it is not theorem admission",
+    "The report is a Trellis-owned record, not an external acceptance decision",
+    "Mantle realizes and signs build outputs, not proof truth or external acceptance policy",
+    "A cached producer output preserves its recorded external acceptance; cache reuse is not a fresh verifier execution",
+    "The recursive tool graph includes declared bootstrap/binary acquisition inputs and does not claim seed-free bootstrap",
+    "Not whole-crate correctness: the claim is scoped to the bounds module and the declared rail",
+    "Not verifier or solver soundness",
+    "Not theorem admission or release eligibility",
+    "The checked run covers all of source/src/lib.rs, which is larger than the scoped claim",
+    "The provider profile names pinned labels; it does not prove Z3 or Verus soundness",
+    "Exact verifier and solver digests are recorded per run in the receipt, not in this static record",
+    "The receipt records a passing verifier run over the listed source bytes; it is not theorem admission",
+    "Mantle and Cairn perform their own bindings and judgment over these bytes"
+  ],
+  "proof_decks": [
+    {
+      "artifact_root": ".",
+      "deck": "proof-cards.json",
+      "evidence_id": "trellis.bounds.verus#rail-0"
+    }
+  ],
+  "schema_version": "octet-requirement-evidence/v1",
+  "source_snapshot": [
+    {
+      "blake3": "4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676",
+      "locator": "source/src/lib.rs"
+    },
+    {
+      "blake3": "c81448f07814bbbdd99b70b8e40df6c3d1cafe8ecfbda8a4d57f6609e2ffe561",
+      "locator": "source/src/bounds.rs"
+    }
+  ]
+}

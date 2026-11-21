@@ -1,7 +1,10 @@
 specs (
   {
     name verified-logic
-    include (docs/*.md)
+    include (
+      docs/*.md
+      .cairn/specs/bounds/spec.md
+    )
     impls (
       {
         name rust

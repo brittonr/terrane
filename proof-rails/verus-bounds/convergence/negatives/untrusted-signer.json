@@ -1,0 +1,17 @@
+{
+  "binding_check": "untrusted signer",
+  "mutation": {
+    "op": "case-set",
+    "pointer": "/trusted_signers",
+    "value": [
+      "other-key-1"
+    ]
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "unrealized",
+    "issues": [
+      "convergence.untrusted_signer"
+    ]
+  }
+}

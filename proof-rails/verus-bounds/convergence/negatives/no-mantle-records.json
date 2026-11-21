@@ -1,0 +1,18 @@
+{
+  "binding_check": "no mantle records",
+  "mutation": {
+    "op": "case-remove",
+    "keys": [
+      "/contracts/0/realization_receipt",
+      "/contracts/0/store_info"
+    ]
+  },
+  "expected": {
+    "exit": 0,
+    "row_state": "unrealized",
+    "issues": [
+      "convergence.realization_missing",
+      "convergence.store_info_missing"
+    ]
+  }
+}

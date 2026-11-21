@@ -1,3 +1,18 @@
+## 2026-11-21
+
+- Add the `trellis-bounds-verus-job` producer package: an owner-authored
+  Trellis job contract, generated profile and provider profile, fail-closed
+  Verus run over `src/lib.rs`, receipt/report/cards/evidence writer, and the
+  Octet `verus-v1-compatibility` envelope authored through the `octet-judge`
+  input.
+- Add the acquisition-only `tools/mantle-producer/export.py` freeze tool.
+- Vendor Cairn's assurance-targets contract and policy at `830b544` under its
+  MIT OR Apache-2.0 grant, add the `cairn-convergence` input and package, and
+  export the content-bound requirement registry at the producer revision.
+- Add the Octet judgment wrapper and the bounds convergence case, which records
+  the `cache-only-preserve-v1` non-claim and an Octet decision over the
+  preserved producer output.
+
 # Changelog
 
 ## Unreleased
