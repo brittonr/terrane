@@ -36,7 +36,7 @@
         {
           "path": "docs/requirements.md",
           "algorithm": "blake3",
-          "digest": "ee6ced3207e18afd7354b00c9413c8e79f2e96aa6b3bd758c64f90eb4fb42a61"
+          "digest": "8365bbebdc6214ce0277ec654e734503e950a7d827f1afc04e7af56fa4c2b80a"
         },
         {
           "path": "src/arithmetic.rs",
@@ -98,7 +98,7 @@
         {
           "path": "docs/requirements.md",
           "algorithm": "blake3",
-          "digest": "ee6ced3207e18afd7354b00c9413c8e79f2e96aa6b3bd758c64f90eb4fb42a61"
+          "digest": "8365bbebdc6214ce0277ec654e734503e950a7d827f1afc04e7af56fa4c2b80a"
         },
         {
           "path": "src/consensus_fast_path/agreement.rs",
@@ -229,7 +229,7 @@
         {
           "path": "docs/requirements.md",
           "algorithm": "blake3",
-          "digest": "ee6ced3207e18afd7354b00c9413c8e79f2e96aa6b3bd758c64f90eb4fb42a61"
+          "digest": "8365bbebdc6214ce0277ec654e734503e950a7d827f1afc04e7af56fa4c2b80a"
         },
         {
           "path": "src/scheme_logic/boundary.rs",
@@ -387,7 +387,7 @@
         {
           "path": "docs/requirements.md",
           "algorithm": "blake3",
-          "digest": "ee6ced3207e18afd7354b00c9413c8e79f2e96aa6b3bd758c64f90eb4fb42a61"
+          "digest": "8365bbebdc6214ce0277ec654e734503e950a7d827f1afc04e7af56fa4c2b80a"
         },
         {
           "path": "src/wasm_runtime_bounds/binding.rs",
@@ -517,7 +517,7 @@
         {
           "path": "docs/requirements.md",
           "algorithm": "blake3",
-          "digest": "ee6ced3207e18afd7354b00c9413c8e79f2e96aa6b3bd758c64f90eb4fb42a61"
+          "digest": "8365bbebdc6214ce0277ec654e734503e950a7d827f1afc04e7af56fa4c2b80a"
         },
         {
           "path": "src/ucan_signature.rs",
@@ -583,7 +583,7 @@
         {
           "path": "docs/requirements.md",
           "algorithm": "blake3",
-          "digest": "ee6ced3207e18afd7354b00c9413c8e79f2e96aa6b3bd758c64f90eb4fb42a61"
+          "digest": "8365bbebdc6214ce0277ec654e734503e950a7d827f1afc04e7af56fa4c2b80a"
         },
         {
           "path": "src/bounded_modular_tree_fold/core.rs",
@@ -656,7 +656,7 @@
         {
           "path": "docs/requirements.md",
           "algorithm": "blake3",
-          "digest": "ee6ced3207e18afd7354b00c9413c8e79f2e96aa6b3bd758c64f90eb4fb42a61"
+          "digest": "8365bbebdc6214ce0277ec654e734503e950a7d827f1afc04e7af56fa4c2b80a"
         },
         {
           "path": "src/fenced_attempt/identity.rs",
@@ -718,7 +718,7 @@
         {
           "path": "docs/requirements.md",
           "algorithm": "blake3",
-          "digest": "ee6ced3207e18afd7354b00c9413c8e79f2e96aa6b3bd758c64f90eb4fb42a61"
+          "digest": "8365bbebdc6214ce0277ec654e734503e950a7d827f1afc04e7af56fa4c2b80a"
         },
         {
           "path": "tests/proof_examples/basic_refinement.rs",
