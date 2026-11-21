@@ -29,7 +29,7 @@
     # Convergence-only Cairn: registry export, targets authoring and
     # `convergence inspect` at the reviewed revision. The legacy `cairn` pin
     # and its vendored policy base stay byte-identical.
-    cairn-convergence.url = "github:OnixResearch/cairn/ffb14c6895fcdccf068fa7d7365f51fdcbc8f74d";
+    cairn-convergence.url = "github:OnixResearch/cairn/830b5446bca69497d34ba65b22d8833927e3b5da";
     # r[impl trellis.convergence_pilot.envelope]
     # Judge-only input: authors the formal-proof envelope through Octet's
     # adapter. The existing octet and octet-aeneas pins stay untouched.

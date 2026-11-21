@@ -314,17 +314,17 @@
         "octet": "octet_2"
       },
       "locked": {
-        "lastModified": 1795223326,
-        "narHash": "sha256-9Ta92xswD00lF7SPc3VGVDC9tqyo+DDs5NdSvId7fCU=",
+        "lastModified": 1795240693,
+        "narHash": "sha256-4YXBdB4juxWHsCNDdxjiswpHYEeNK/+XA2rFCauPJzY=",
         "owner": "OnixResearch",
         "repo": "cairn",
-        "rev": "ffb14c6895fcdccf068fa7d7365f51fdcbc8f74d",
+        "rev": "830b5446bca69497d34ba65b22d8833927e3b5da",
         "type": "github"
       },
       "original": {
         "owner": "OnixResearch",
         "repo": "cairn",
-        "rev": "ffb14c6895fcdccf068fa7d7365f51fdcbc8f74d",
+        "rev": "830b5446bca69497d34ba65b22d8833927e3b5da",
         "type": "github"
       }
     },
