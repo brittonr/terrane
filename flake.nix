@@ -253,6 +253,26 @@ EOF
             cp "$CARGO_TARGET_DIR/release/trellis-verus-producer" "$out/bin/"
           '';
 
+        producer = trellisVerusProducer;
+        envelope = trellisVerusEnvelope;
+        trellisBoundsVerusJobSourceRevision = self.rev or "0000000000000000000000000000000000000000";
+        trellisBoundsVerusJob = import ./nix/trellis-bounds-verus-job.nix {
+          inherit pkgs nickel currentVerus verusProofSource;
+          inherit producer envelope;
+          gatesScript = ./proof-rails/verus-bounds/verus-job-gates.sh;
+          jobContract = ./proof-rails/verus-bounds/mantle-job.ncl;
+          profileSource = ./proof-rails/verus-bounds/profile.ncl;
+          profileJson = ./proof-rails/verus-bounds/generated/profile.json;
+          providerSource = ./proof-rails/verus-bounds/provider-profile.ncl;
+          providerJson = ./proof-rails/verus-bounds/generated/provider-profile.json;
+          cargoToml = ./Cargo.toml;
+          cargoLock = ./Cargo.lock;
+          rustToolchainFile = ./rust-toolchain.toml;
+          flakeLock = ./flake.lock;
+          sourceRevision = trellisBoundsVerusJobSourceRevision;
+          rlimit = trellisRlimit;
+        };
+
         nativeBuildInputs = with pkgs; [
           pkg-config
           clang
@@ -1235,6 +1255,7 @@ EOF
           verus-upgrade-trial = verusUpgradeTrial;
           octet-aeneas-provider = octetAeneasProvider;
           nickel-export = nickelExport;
+          trellis-bounds-verus-job = trellisBoundsVerusJob;
           trellis-verus-producer = trellisVerusProducer;
           trellis-verus-envelope = trellisVerusEnvelope;
         };
@@ -1242,6 +1263,65 @@ EOF
         checks = {
           inherit verified-logic;
 
+          # r[verify trellis.convergence_pilot.fixtures]
+          trellis-bounds-verus-job-gates =
+            pkgs.runCommand "trellis-bounds-verus-job-gates"
+              {
+                nativeBuildInputs = [ nickel pkgs.b3sum pkgs.jq ];
+              }
+              ''
+                bash ${./proof-rails/verus-bounds/verus-job-gates.sh} self-test \
+                  ${nickel}/bin/nickel ${pkgs.b3sum}/bin/b3sum ${pkgs.jq}/bin/jq
+                mkdir -p "$out"
+              '';
+
+          # r[verify trellis.nickel_toolchain.cohort]
+          nickel-cohort-exact =
+            pkgs.runCommand "trellis-nickel-cohort-exact"
+              {
+                nativeBuildInputs = [ nickel ];
+              }
+              ''
+                test '${nickel-1-17-0.rev}' = '1320a983e6c3d1e2fb53dd2464b084b4903b1426'
+                test "$(command -v nickel)" = '${nickel}/bin/nickel'
+                test "$(nickel --version)" = 'nickel-lang-cli nickel 1.17.0 (rev 1320a98)'
+                if grep -q 'pkgs\.nickel' ${self}/flake.nix; then
+                  echo 'older, floating, ambient, or mixed Nickel evaluator reference found' >&2
+                  exit 1
+                fi
+                mkdir -p "$out"
+              '';
+
+          # r[verify trellis.nickel_toolchain.compatibility]
+          # r[verify trellis.nickel_toolchain.evidence]
+          nickel-toolchain-fixtures =
+            pkgs.runCommand "trellis-nickel-toolchain-fixtures"
+              {
+                nativeBuildInputs = [
+                  nickel
+                  pkgs.diffutils
+                ];
+              }
+              ''
+                fixtures=${src}/verification-policy/nickel-toolchain
+                nickel export --format json ${src}/verification-policy/nickel-evaluator.ncl \
+                  > evaluator.json
+                diff --unified ${src}/verification-policy/generated/nickel-evaluator.json evaluator.json
+                for fixture in "$fixtures"/positive/*.ncl; do
+                  nickel typecheck "$fixture"
+                  nickel export --format json "$fixture" > /dev/null
+                done
+                for fixture in "$fixtures"/negative/*.ncl; do
+                  if nickel eval "$fixture" >negative.out 2>negative.err; then
+                    echo "negative Nickel fixture unexpectedly passed: $fixture" >&2
+                    exit 1
+                  fi
+                  test -s negative.err
+                done
+                mkdir -p "$out"
+              '';
+
+          # Cargo tests with nextest
           nextest = craneLib.cargoNextest {
             inherit
               src
