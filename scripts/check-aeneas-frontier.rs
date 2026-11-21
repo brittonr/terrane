@@ -30,6 +30,9 @@ const TARGETS_PATH: &str = "aeneas-frontier/targets.json";
 const FRONTIER_PATH: &str = "aeneas-frontier/generated/frontier.json";
 const REGISTRY_PATH: &str = "aeneas-frontier/generated/registry.json";
 const REQUIREMENTS_PATH: &str = "docs/requirements.md";
+// Requirement text may live in the Cairn specification tree; the frontier
+// accepts IDs declared by either surface, mirroring Tracey's spec include.
+const SPEC_PATHS: [&str; 1] = [".cairn/specs/bounds/spec.md"];
 const CLAIM_DOCUMENTS: [&str; 2] = [
     "docs/aeneas-cross-verifier-pilot.md",
     "docs/aeneas-lean-coverage-frontier.md",
@@ -225,7 +228,12 @@ fn load_inputs(root: &Path, load: Load) -> Result<Inputs, String> {
     let observations: ObservationsFile = parse_json(&observations_bytes, OBSERVATIONS_PATH)?;
     let targets_bytes = read_relative(root, TARGETS_PATH)?;
     let targets: TargetsFile = parse_json(&targets_bytes, TARGETS_PATH)?;
-    let requirement_ids = parse_requirement_ids(&read_relative(root, REQUIREMENTS_PATH)?)?;
+    let mut requirement_ids = parse_requirement_ids(REQUIREMENTS_PATH, &read_relative(root, REQUIREMENTS_PATH)?)?;
+    for path in SPEC_PATHS {
+        requirement_ids.extend(parse_requirement_ids(path, &read_relative(root, path)?)?);
+    }
+    requirement_ids.sort();
+    requirement_ids.dedup();
     let (frontier, registry) = match load {
         Load::InputsOnly => (None, None),
         Load::WithGenerated => (
@@ -265,9 +273,9 @@ fn scan_inventory(root: &Path) -> Result<Vec<String>, String> {
     Ok(modules.into_iter().collect())
 }
 
-fn parse_requirement_ids(bytes: &[u8]) -> Result<Vec<String>, String> {
+fn parse_requirement_ids(path: &str, bytes: &[u8]) -> Result<Vec<String>, String> {
     let text =
-        String::from_utf8(bytes.to_vec()).map_err(|error| format!("`{REQUIREMENTS_PATH}` is not UTF-8: {error}"))?;
+        String::from_utf8(bytes.to_vec()).map_err(|error| format!("`{path}` is not UTF-8: {error}"))?;
     let mut identifiers = BTreeSet::new();
     for line in text.lines() {
         let Some(rest) = line.strip_prefix("r[") else {
@@ -284,7 +292,7 @@ fn parse_requirement_ids(bytes: &[u8]) -> Result<Vec<String>, String> {
         let _ = identifiers.insert(identifier.to_owned());
     }
     if identifiers.is_empty() {
-        return Err(format!("`{REQUIREMENTS_PATH}` declares no requirement identifiers"));
+        return Err(format!("`{path}` declares no requirement identifiers"));
     }
     Ok(identifiers.into_iter().collect())
 }
