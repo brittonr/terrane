@@ -779,7 +779,8 @@ mod tests {
 
         fn envelope_script(&self, body: &str) -> PathBuf {
             let path = self.path("envelope-tool");
-            fs::write(&path, body).expect("script");
+            let bash = std::env::var("BASH").unwrap_or_else(|_| "/bin/bash".to_owned());
+            fs::write(&path, format!("#!{bash}\n{body}")).expect("script");
             let mut permissions = fs::metadata(&path).expect("metadata").permissions();
             permissions.set_mode(0o755);
             fs::set_permissions(&path, permissions).expect("chmod");
@@ -787,8 +788,7 @@ mod tests {
         }
     }
 
-    const GOOD_ENVELOPE: &str = r#"#!/usr/bin/env bash
-set -euo pipefail
+    const GOOD_ENVELOPE: &str = r#"set -euo pipefail
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --receipt) receipt="$2"; shift 2 ;;
@@ -805,8 +805,7 @@ jq -s '{schema_version:"octet-formal-proof-envelope/v1", provider_id:"verus-v1-c
   "$receipt" > "$output"
 "#;
 
-    const WRONG_PROVIDER_ENVELOPE: &str = r#"#!/usr/bin/env bash
-set -euo pipefail
+    const WRONG_PROVIDER_ENVELOPE: &str = r#"set -euo pipefail
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --receipt) receipt="$2"; shift 2 ;;

@@ -1263,6 +1263,57 @@ EOF
         checks = {
           inherit verified-logic;
 
+          # r[verify trellis.convergence_pilot.envelope]
+          trellis-verus-envelope-fixtures =
+            pkgs.runCommand "trellis-verus-envelope-fixtures"
+              {
+                nativeBuildInputs = [ trellisVerusEnvelope pkgs.jq ];
+              }
+              ''
+                fixtures=${./proof-rails/verus-bounds/fixtures/envelope}
+                envelope=${trellisVerusEnvelope}/bin/trellis-verus-envelope
+                mkdir -p "$out"
+                "$envelope" --receipt "$fixtures/passing.json" --output "$out/passing.json"
+                jq --exit-status '.schema_version == "octet-formal-proof-envelope/v1" and .provider_id == "verus-v1-compatibility" and .status == "passed" and (.provider.payload.receipt.status == "passed")' "$out/passing.json" > /dev/null
+                "$envelope" --receipt "$fixtures/failed.json" --output "$out/failed.json"
+                jq --exit-status '.status == "failed" and .evidence_tier == "recorded_only"' "$out/failed.json" > /dev/null
+                if "$envelope" --receipt "$fixtures/unknown-status.json" --output "$out/unknown.json"; then
+                  echo 'unknown receipt status was accepted' >&2
+                  exit 1
+                fi
+                if [ -e "$out/unknown.json" ]; then
+                  echo 'unknown receipt status wrote an envelope' >&2
+                  exit 1
+                fi
+              '';
+
+          # r[verify trellis.convergence_pilot.fixtures]
+          trellis-verus-producer-tests =
+            pkgs.runCommand "trellis-verus-producer-tests"
+              {
+                nativeBuildInputs = [
+                  pkgs.cargo
+                  rustToolchain
+                  pkgs.clang
+                  pkgs.mold
+                  pkgs.jq
+                ];
+                inherit (pkgs.stdenv) cc;
+                BASH = "${pkgs.bash}/bin/bash";
+              }
+              ''
+                cp -R ${./tools/verus-producer} source
+                chmod -R u+w source
+                export HOME="$TMPDIR/home"
+                mkdir -p "$HOME" "$TMPDIR/cargo-home" "$TMPDIR/cargo-target" "$out"
+                cp ${trellisVerusProducerVendor}/config.toml "$TMPDIR/cargo-home/config.toml"
+                export CARGO_HOME="$TMPDIR/cargo-home"
+                export CARGO_TARGET_DIR="$TMPDIR/cargo-target"
+                export CARGO_NET_OFFLINE=true
+                cd source
+                cargo test --offline
+              '';
+
           # r[verify trellis.convergence_pilot.fixtures]
           trellis-bounds-verus-job-gates =
             pkgs.runCommand "trellis-bounds-verus-job-gates"
