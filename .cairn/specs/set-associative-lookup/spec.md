@@ -46,7 +46,7 @@ in the same set.
 - THEN they map to the same cache line (same tag match)
 
 ### Requirement: Hit Correctness
-r[cache-partition.isolation]
+r[set-assoc.hit]
 
 A cache hit MUST mean the tag stored in the matched way equals the
 requested tag.

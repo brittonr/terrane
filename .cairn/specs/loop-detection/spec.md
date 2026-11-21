@@ -140,7 +140,7 @@ The loop nesting relation MUST form a forest.
 - THEN one is nested in the other (strict nesting hierarchy)
 
 ### Requirement: Exit Edges
-r[loop.header-dominance]
+r[loop.exits]
 
 All edges from loop body nodes to non-body nodes MUST be identified as
 exit edges.
