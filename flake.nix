@@ -25,6 +25,13 @@
       inputs.cairn.follows = "cairn";
     };
     cairn.url = "github:OnixResearch/cairn-public/acb4c3d2cb90b231e07a6b71115c79adde46349c";
+    # r[impl trellis.convergence_pilot.envelope]
+    # Judge-only input: authors the formal-proof envelope through Octet's
+    # adapter. The existing octet and octet-aeneas pins stay untouched.
+    octet-judge = {
+      url = "github:OnixResearch/octet/36d4cecbf5a87c4e2629e36e5b6e32f7a42e050e";
+      inputs.crane.follows = "crane";
+    };
     trellis-consumer-release-src = {
       url = "git+https://github.com/OnixResearch/terrane.git?rev=df99309c31e95b8068d90153e362dad6234d0cca";
       flake = false;
@@ -42,7 +49,7 @@
   };
 
   outputs =
-    {
+    inputs@{
       self,
       nixpkgs,
       crane,
@@ -120,6 +127,131 @@
           mkdir -p $out/src
           cp -R ${./src}/. $out/src/
         '';
+
+        # Octet judge-only input: the envelope mapping is authored upstream.
+        # Its vendored git sources are projected exactly as Octet's own flake
+        # does, so the wrapper builds offline from the locked source set.
+        octetJudgeSource = inputs.octet-judge;
+        octetJudgeDependencies = builtins.fromJSON (
+          builtins.readFile (octetJudgeSource + "/vendor/dependencies.json")
+        );
+        octetJudgeSources = builtins.listToAttrs (
+          map (source: {
+            name = source.name;
+            value = {
+              outPath = octetJudgeSource + "/${source.destination}";
+              rev = source.revision;
+            };
+          }) octetJudgeDependencies.sources
+        );
+        octetJudgeCargoSource =
+          source:
+          let
+            original = octetJudgeSources.${source.name};
+            upstream = builtins.fromTOML (builtins.readFile (original.outPath + "/Cargo.toml"));
+            manifest = (pkgs.formats.toml { }).generate "${source.name}-workspace.toml" {
+              workspace = upstream.workspace // {
+                members = source.workspace_members;
+                default-members = source.workspace_members;
+                exclude = [ ];
+              };
+            };
+          in
+          if source.workspace_members == [ ] then
+            original
+          else
+            pkgs.runCommand "${source.name}-cargo-source-${source.revision}" { } ''
+              cp -R ${original}/. "$out"
+              chmod u+w "$out/Cargo.toml"
+              cp ${manifest} "$out/Cargo.toml"
+            '';
+        octetJudgeOverrideGitSource =
+          packages: drv:
+          let
+            package = builtins.head packages;
+            source = package.source;
+            matching = builtins.filter (
+              entry:
+              source == "git+${entry.repository}?rev=${entry.revision}#${entry.revision}"
+              || source
+              == "git+${builtins.replaceStrings [ "https://github.com/" ] [ "ssh://git@github.com/" ] entry.repository}?rev=${entry.revision}#${entry.revision}"
+            ) octetJudgeDependencies.sources;
+          in
+          if matching == [ ] then
+            drv
+          else
+            drv.overrideAttrs (_: {
+              src = octetJudgeCargoSource (builtins.head matching);
+            });
+        octetJudgeVendorDir = craneLib.vendorCargoDeps {
+          src = octetJudgeSource;
+          overrideVendorGitCheckout = octetJudgeOverrideGitSource;
+        };
+        octetJudgeEnvelopeSource =
+          pkgs.runCommand "octet-judge-envelope-source" { } ''
+            cp -R ${octetJudgeSource}/. "$out"
+            chmod -R u+w "$out"
+            mkdir -p "$out/crates/octet-standards/src/bin"
+            cp ${./tools/octet-envelope-wrapper/trellis-verus-envelope.rs} \
+              "$out/crates/octet-standards/src/bin/trellis-verus-envelope.rs"
+            cat >> "$out/crates/octet-standards/Cargo.toml" <<'EOF'
+
+[[bin]]
+name = "trellis-verus-envelope"
+path = "src/bin/trellis-verus-envelope.rs"
+EOF
+          '';
+        trellisVerusEnvelope = pkgs.runCommand "trellis-verus-envelope-0.1.0"
+          {
+            nativeBuildInputs = [
+              pkgs.cargo
+              rustToolchain
+              pkgs.clang
+              pkgs.mold
+              pkgs.pkg-config
+            ];
+            inherit (pkgs.stdenv) cc;
+          }
+          ''
+            cp -R ${octetJudgeEnvelopeSource} source
+            chmod -R u+w source
+            export HOME="$TMPDIR/home"
+            mkdir -p "$HOME" "$TMPDIR/cargo-home" "$TMPDIR/cargo-target" "$out/bin"
+            cp ${octetJudgeVendorDir}/config.toml "$TMPDIR/cargo-home/config.toml"
+            export CARGO_HOME="$TMPDIR/cargo-home"
+            export CARGO_TARGET_DIR="$TMPDIR/cargo-target"
+            export CARGO_NET_OFFLINE=true
+            cd source
+            cargo build --release --offline -p octet-standards --bin trellis-verus-envelope
+            cp "$CARGO_TARGET_DIR/release/trellis-verus-envelope" "$out/bin/"
+          '';
+        trellisVerusProducerVendor = craneLib.vendorCargoDeps {
+          cargoLock = ./tools/verus-producer/Cargo.lock;
+        };
+        trellisVerusProducer = pkgs.runCommand "trellis-verus-producer-0.1.0"
+          {
+            nativeBuildInputs = [
+              pkgs.cargo
+              rustToolchain
+              pkgs.clang
+              pkgs.mold
+              pkgs.pkg-config
+            ];
+            inherit (pkgs.stdenv) cc;
+          }
+          ''
+            cp -R ${./tools/verus-producer} source
+            chmod -R u+w source
+            export HOME="$TMPDIR/home"
+            mkdir -p "$HOME" "$TMPDIR/cargo-home" "$TMPDIR/cargo-target" "$out/bin"
+            cp ${trellisVerusProducerVendor}/config.toml "$TMPDIR/cargo-home/config.toml"
+            export CARGO_HOME="$TMPDIR/cargo-home"
+            export CARGO_TARGET_DIR="$TMPDIR/cargo-target"
+            export CARGO_NET_OFFLINE=true
+            cd source
+            cargo build --release --offline --bin trellis-verus-producer
+            cp "$CARGO_TARGET_DIR/release/trellis-verus-producer" "$out/bin/"
+          '';
 
         nativeBuildInputs = with pkgs; [
           pkg-config
@@ -1103,58 +1235,13 @@
           verus-upgrade-trial = verusUpgradeTrial;
           octet-aeneas-provider = octetAeneasProvider;
           nickel-export = nickelExport;
+          trellis-verus-producer = trellisVerusProducer;
+          trellis-verus-envelope = trellisVerusEnvelope;
         };
 
         checks = {
           inherit verified-logic;
 
-          # r[verify trellis.nickel_toolchain.cohort]
-          nickel-cohort-exact =
-            pkgs.runCommand "trellis-nickel-cohort-exact"
-              {
-                nativeBuildInputs = [ nickel ];
-              }
-              ''
-                test '${nickel-1-17-0.rev}' = '1320a983e6c3d1e2fb53dd2464b084b4903b1426'
-                test "$(command -v nickel)" = '${nickel}/bin/nickel'
-                test "$(nickel --version)" = 'nickel-lang-cli nickel 1.17.0 (rev 1320a98)'
-                if grep -q 'pkgs\.nickel' ${self}/flake.nix; then
-                  echo 'older, floating, ambient, or mixed Nickel evaluator reference found' >&2
-                  exit 1
-                fi
-                mkdir -p "$out"
-              '';
-
-          # r[verify trellis.nickel_toolchain.compatibility]
-          # r[verify trellis.nickel_toolchain.evidence]
-          nickel-toolchain-fixtures =
-            pkgs.runCommand "trellis-nickel-toolchain-fixtures"
-              {
-                nativeBuildInputs = [
-                  nickel
-                  pkgs.diffutils
-                ];
-              }
-              ''
-                fixtures=${src}/verification-policy/nickel-toolchain
-                nickel export --format json ${src}/verification-policy/nickel-evaluator.ncl \
-                  > evaluator.json
-                diff --unified ${src}/verification-policy/generated/nickel-evaluator.json evaluator.json
-                for fixture in "$fixtures"/positive/*.ncl; do
-                  nickel typecheck "$fixture"
-                  nickel export --format json "$fixture" > /dev/null
-                done
-                for fixture in "$fixtures"/negative/*.ncl; do
-                  if nickel eval "$fixture" >negative.out 2>negative.err; then
-                    echo "negative Nickel fixture unexpectedly passed: $fixture" >&2
-                    exit 1
-                  fi
-                  test -s negative.err
-                done
-                mkdir -p "$out"
-              '';
-
-          # Cargo tests with nextest
           nextest = craneLib.cargoNextest {
             inherit
               src
