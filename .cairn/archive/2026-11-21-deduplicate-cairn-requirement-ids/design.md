@@ -50,3 +50,24 @@ byte-for-byte; only the `r[...]` line changes.
   `control-flow-graph/spec.md:154` is left unchanged: it is not one of the nine
   duplicates, and renaming it would conflict with reusing the canonical ID in
   the same delta.
+
+## Note 2026-11-21: actual repair path
+
+This section is an appended correction; the decision text above is unchanged.
+
+`cairn sync` refused the planned REMOVED+ADDED deltas before any accepted
+bytes changed, with
+`delta_merge.duplicate_accepted_id: accepted requirement ID
+'fetch-add.associativity' occurs in conflicting blocks`. Delta merge
+preflights the accepted document, so it cannot target an ID that two blocks
+already share. The nine requirement ID lines were therefore edited directly in
+`.cairn/specs/<domain>/spec.md`; only the `r[...]` line moved. The change's
+MODIFIED deltas then synced as `already_applied` with `blocked: false` and
+`changed: false`, and `cairn archive` recorded one action. No requirement
+heading, body or scenario changed.
+
+Product observation, not a claim: at this revision Cairn's delta merge cannot
+repair an accepted requirement ID that already occurs in two blocks, because
+the preflight refuses the accepted document before operations are applied. A
+one-time direct correction, recorded in change evidence, was the available
+path.
