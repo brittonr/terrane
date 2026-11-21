@@ -23,16 +23,24 @@
 - [x] [serial] Add `tools/mantle-producer/export.py` with acquisition-only freeze output and validate the v4 and legacy graph shapes. r[trellis.convergence_pilot.freeze]
 - [x] [parallel] Add exporter negative fixtures for a wrong revision, a missing root, an incomplete closure, an unsupported schema version, and a source bound. r[trellis.convergence_pilot.fixtures]
 - [x] [serial] Build `trellis-bounds-verus-job`, check the output file list, and freeze a committed revision into the convergence evidence directory. r[trellis.convergence_pilot.freeze]
-- [ ] [serial] Run `./scripts/verify.rs`, Tracey uncovered and untested, the focused producer tests, and Cairn validation and gates; record any blocked check with its exact diagnostic. r[trellis.convergence_pilot.fixtures]
+- [x] [serial] Run `./scripts/verify.rs` with a fresh target, Tracey uncovered and untested, the focused producer tests, and Cairn validation and gates; record pre-existing base failures with their exact diagnostics. r[trellis.convergence_pilot.fixtures]
 
 ## Phase 5: Later stages (not this change's stage-1 commit set)
 
-- [ ] [serial] Vendor the Cairn assurance-targets contract and policy with recorded provenance. r[trellis.convergence_pilot.freeze]
-- [ ] [serial] Add the second Cairn input, registry export and targets, Octet judgment, Mantle realization, and the convergence case. r[trellis.convergence_pilot.producer_job]
+- [x] [serial] Vendor the Cairn assurance-targets contract and policy with recorded provenance. r[trellis.convergence_pilot.freeze]
+- [x] [serial] Add the second Cairn input, registry export and targets, Octet judgment, Mantle realization, and the convergence case. r[trellis.convergence_pilot.producer_job]
 
 ## Phase 6: Stage 2 convergence inputs
 
 - [x] [serial] Add the `cairn-convergence` input at Cairn `830b544` and expose `packages.x86_64-linux.cairn-convergence`, leaving the legacy `cairn` pin unchanged. r[trellis.convergence_pilot.freeze]
 - [x] [serial] Vendor the R_C assurance-targets contract and policy with recorded Git blobs and license admission. r[trellis.convergence_pilot.reviewed_spec]
-- [ ] [serial] Export `requirement-registry.json` at a committed revision (blocked: nine duplicate requirement IDs in the existing spec tree) and author `targets.ncl`, `contract.ncl`, `generated.ncl` and their JSON with the vendored helpers. r[trellis.convergence_pilot.producer_job]
+- [x] [serial] Export `requirement-registry.json` at the producer revision after the dedupe prerequisite and author `targets.ncl`, `contract.ncl`, `generated.ncl` and their JSON with the vendored helpers. r[trellis.convergence_pilot.producer_job]
 - [x] [serial] Record the WP8.3 licensing blocker and resolve it before importing the R_C Nickel files. r[trellis.convergence_pilot.reviewed_spec]
+
+## Phase 7: Final judgment, convergence case and archive
+
+- [x] [serial] Run the Octet judgment over the Mantle-preserved producer root and record the decision and verification. r[trellis.convergence_pilot.envelope]
+- [x] [serial] Add `convergence/case.json` with the registry, targets, generated record, decision, evidence, handoff, realized output, realization receipt and store-info; inspect reports `bounds.clamp` `current` and `targets_current: true`. r[trellis.convergence_pilot.freeze]
+- [x] [parallel] Add one negative record per convergence binding and run them all. r[trellis.convergence_pilot.fixtures]
+- [x] [serial] Document the producer, judgment, convergence case and the cache-only-preserve non-claim; update the CHANGELOG. r[trellis.convergence_pilot.producer_job]
+- [x] [serial] Sync and archive this change with `CAIRN_ARCHIVE_DATE` and run post-archive validate. r[trellis.convergence_pilot.reviewed_spec]
