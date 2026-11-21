@@ -25,6 +25,11 @@
       inputs.cairn.follows = "cairn";
     };
     cairn.url = "github:OnixResearch/cairn-public/acb4c3d2cb90b231e07a6b71115c79adde46349c";
+    # r[impl trellis.convergence_pilot.registry_export]
+    # Convergence-only Cairn: registry export, targets authoring and
+    # `convergence inspect` at the reviewed revision. The legacy `cairn` pin
+    # and its vendored policy base stay byte-identical.
+    cairn-convergence.url = "github:OnixResearch/cairn/ffb14c6895fcdccf068fa7d7365f51fdcbc8f74d";
     # r[impl trellis.convergence_pilot.envelope]
     # Judge-only input: authors the formal-proof envelope through Octet's
     # adapter. The existing octet and octet-aeneas pins stay untouched.
@@ -57,6 +62,7 @@
       flake-utils,
       octet,
       octet-aeneas,
+      cairn-convergence,
       nickel-export,
       trellis-consumer-release-src,
       verus-upgrade-trial-src,
@@ -1258,6 +1264,7 @@ EOF
           trellis-bounds-verus-job = trellisBoundsVerusJob;
           trellis-verus-producer = trellisVerusProducer;
           trellis-verus-envelope = trellisVerusEnvelope;
+          cairn-convergence = cairn-convergence.packages.${system}.cairn;
         };
 
         checks = {
