@@ -46,14 +46,20 @@ cairn convergence inspect --case proof-rails/verus-bounds/convergence/case.json 
   --root <checkout at the registry revision>
 ```
 
-## Realization non-claim
+## Realization
 
-The pilot's realization uses Mantle's `cache-only-preserve-v1` route: the job
-output was built by Nix and preserved through Mantle; Mantle did not build it.
-The real build route (Mantle building the frozen root from a hydrated
-dependency closure) is unsupported at the tested Mantle revision. The
-convergence receipt's `bound.realization_route` records the preserve route, and
-a cache hit remains an earlier acceptance, not fresh proof work.
+Mantle builds the frozen root with the `cache-inputs-build-roots-v1` route:
+inputs are hydrated from the WP8-signed cache and the root is built by the
+checked `mantle` executable from Mantle `5263dabfc…`
+(`a3cf3924…`); the bridge is from a clean export of the same commit
+(`604da752…`). The Mantle-built output
+`/nix/store/5hqkrl54…-trellis-bounds-verus-job` is byte-identical to the
+Nix-built output (same NAR, empty `diff -r`), and the convergence receipt
+records route `cache-inputs-build-roots-v1`.
+
+Mantle does not rebuild the hydrated inputs; their trust is the WP8 signing key
+and the Nix cache. The bridge does not evaluate proofs. The refusal case is
+recorded where Mantle's route checks that a cache offering the root is refused.
 
 Octet's decision is the only acceptance. Cairn binds saved records; it does not
 re-run any tool, authenticate producers or verify signatures.

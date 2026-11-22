@@ -25,7 +25,7 @@
   "paths": [
     {
       "ca": null,
-      "deriver": "cvgjzlyd2nn1ihbq4z4s5ns6slirx7is-trellis-bounds-verus-job",
+      "deriver": "clnjhb7wy6fgrakdrjdz23ki8ahzap8c-trellis-bounds-verus-job",
       "layer": {
         "kind": "overlay"
       },
@@ -41,7 +41,7 @@
           {
             "owner": "legacy-unmanaged",
             "reason": "legacy-root-registered",
-            "record_id": "046e21910f7d476fba8d0f88bed50b5050e645f2a2665264ce7f5781c74cd442"
+            "record_id": "9ed9c9347826edb8dd72042b51e44167752f3c0f14dc486b5c2dcea680f48509"
           }
         ],
         "legacy_unmanaged": false,
@@ -50,8 +50,7 @@
       },
       "shadows": [],
       "signatures": [
-        "britton-desktop-1:/Audydfwi/8aaefG9sfcWS8dwNIam6z30/gtGyIU1hGeHrIfssVGTv7StsfQyahcBUmhJm4lfwz1ILi1o047Aw==",
-        "wp8-20261121-1:eC6NGnd4moBc/Sldbywa83JOGCSr19t/Brb60ElYxFMLWbGYLN6BrkiMyHVXzez2tfFRX5pLwS6KSfwG28Z5AA=="
+        "crunch-britton-desktop-1:mriiquJGxdP8GpIrzNkFfwlm6kk8V/4HU4FwnHryCkfooIjOXqkAMmX18Sinxhjd0ePmAQKdJJZWB0bo8b5vDQ=="
       ],
       "store_path": "5hqkrl54nhfa44nmmaf80phvyi5kvjz1-trellis-bounds-verus-job"
     }

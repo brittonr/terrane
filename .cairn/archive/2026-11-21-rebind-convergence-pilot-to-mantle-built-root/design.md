@@ -46,27 +46,25 @@ rebuild hydrated inputs.
 **Rationale:** the route makes the old non-claims false. The new statement is
 the actual trust boundary, not a broader correctness claim.
 
-## E2 facts to fill (placeholders)
+## E2 facts
 
-Each token below appears where the value is required. No value may be guessed;
-all come from E2's records.
-
-| Placeholder | Source |
+| Fact | Value |
 |---|---|
-| `E2_PHYSICAL_ROOT` | Mantle physical store path of the built root |
-| `E2_TARGET_PATH` | built root store path |
-| `E2_NODE_ID` | realization unit `node_id` (`nix:` + built root drv name) |
-| `E2_TARGET_DERIVATION` | realization unit `target_derivation` |
-| `E2_UNIT_INDEX` | index of the unit whose `node_id` matches |
-| `E2_RECEIPT_BLAKE3`, `E2_PLAN_BLAKE3`, `E2_IMPORT_RECEIPT_BLAKE3` | preserve receipt fields |
-| `E2_STORE_NAR_SHA256`, `E2_SIGNER` | store-info record |
-| `E2_MANTLE_BLAKE3`, `E2_BRIDGE_BLAKE3` | checked executable digests |
-| `E2_HANDOFF_RECEIPT`, `E2_HANDOFF_ASSOCIATION`, `E2_HANDOFF_JOB`, `E2_HANDOFF_GRAPH`, `E2_HANDOFF_REPORT` | `handoff-built/mantle-observation.json` and report |
-| `E2_CACHE_PUBLIC_KEY_NAME` | WP8 key name (secret never recorded) |
-| `E2_NAR_MATCH`, `E2_DIFF_CLEAN` | NAR comparison and `diff -r` result |
-| `E2_DECISION_BLAKE3`, `E2_VERIFICATION` | Octet decision and verify result |
-| `E2_CONVERGENCE_RECEIPT_BLAKE3` | new inspect receipt |
-| `E2_NEGATIVES` | `20/20` when all per-binding records behave |
+| physical root | `/datapool/mantle-store/wp8-20261121/realize-evidence-store/5hqkrl54nhfa44nmmaf80phvyi5kvjz1-trellis-bounds-verus-job` |
+| built target path | `/nix/store/5hqkrl54nhfa44nmmaf80phvyi5kvjz1-trellis-bounds-verus-job` |
+| node id | `nix:cvgjzlyd2nn1ihbq4z4s5ns6slirx7is-trellis-bounds-verus-job.drv` |
+| target derivation | `/nix/store/clnjhb7wy6fgrakdrjdz23ki8ahzap8c-trellis-bounds-verus-job.drv` |
+| unit index | 7523 |
+| receipt / plan / import / build-report BLAKE3 | `48e0bea9…`, `2183efc5…`, `f719f54d…`, `96ee9801…` |
+| store-info NAR / signer | `cd49fa0c…` (`sha256-zUn6DMJIENyxoINDZMGptW0FLphtmE0ydx9mfM1ft1o=`) / `crunch-britton-desktop-1` |
+| checked executables | mantle `a3cf3924…` (route code `5263dabfc…`), bridge `604da752…` |
+| handoff receipt / association / job / graph / report | `b3:e1186ca7…`, `b3:9fcafc24…`, `b3:387008d0…`, `b3:8bc04fed…`, `b3:5c2d65ad…` |
+| route dispositions | 1 built, 264 substituted, 12 already-present, 7,247 not-required |
+| cache public key name | WP8 signing key (secret never recorded) |
+| NAR match / diff | equal / empty |
+| decision / verification | `aaa7f5a4…` / passed |
+| convergence receipt | `bc6bd2c129eff3297b96844627ec6826bd46da066a7e36700ec35ec41e8b30e6` |
+| negatives | 20/20 behaved as specified |
 
 ## Risks / Trade-offs
 
