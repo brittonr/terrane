@@ -35,7 +35,7 @@ The remaining 39 artifact rows are unchanged between `df99309` and `c11837c5`.
 - `./scripts/verus.sh src/lib.rs --rlimit 20` → exit 0, `verification results:: 11139 verified, 0 errors`.
 - `tracey query uncovered` → `0 uncovered out of 2270 rules`.
 - `tracey query untested` → `0 untested out of 2270 rules`.
-- `./scripts/verify.rs` → exit 0 with `ALL CHECKS PASSED` and every section green.
+- `nix --option min-free 0 --option builders '' develop -c ./scripts/verify.rs` → exit 0 with `ALL CHECKS PASSED` and every section green (run inside the dev shell with `RUSTC_WRAPPER=` and a fresh `CARGO_TARGET_DIR`; a rustup-shim `rustc` inherited outside the dev shell makes the cargo-script checkers reuse artifacts from an incompatible compiler).
 
 ## Non-claims
 

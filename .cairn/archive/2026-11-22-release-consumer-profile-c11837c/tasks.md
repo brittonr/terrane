@@ -9,8 +9,8 @@
 - [x] [serial] Run `./scripts/check-verified-logic-consumer-profile.rs` in the dev shell and capture the passing output plus its exit code. r[trellis.crate_packaging.consumer_release_profile_rebind_validation]
 - [x] [serial] Run `nix build .#checks.x86_64-linux.consumer-release-profile --no-link -L` in the dev shell and capture the exit code, confirming the Nix gate observes the same revision as the profile. r[trellis.crate_packaging.consumer_release_profile_binding]
 - [x] [serial] Run `./scripts/verus.sh src/lib.rs`, `tracey query uncovered`, and `tracey query untested`, and capture their exit codes and rule counts. r[trellis.crate_packaging.consumer_release_profile_rebind_validation]
-- [ ] [serial] Run the full `./scripts/verify.rs` to exit 0 with every section green, and capture the transcript as validation evidence. r[trellis.crate_packaging.consumer_release_profile_rebind_validation]
+- [x] [serial] Run the full `./scripts/verify.rs` to exit 0 with every section green, and capture the transcript as validation evidence. r[trellis.crate_packaging.consumer_release_profile_rebind_validation]
 
 ## Phase 3: Lifecycle
 
-- [ ] [serial] Sync the accepted delta spec, archive the change package, and validate the post-archive layout with `cairn validate --root . --policy cairn-policy/generated/cairn-policy.json --strict`. r[trellis.crate_packaging.consumer_release_profile_binding]
+- [x] [serial] Sync the accepted delta spec, archive the change package, and validate the post-archive layout with `cairn validate --root . --policy cairn-policy/generated/cairn-policy.json --strict`. r[trellis.crate_packaging.consumer_release_profile_binding]
