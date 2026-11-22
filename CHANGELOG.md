@@ -1,3 +1,13 @@
+## 2026-11-21 (built-root convergence)
+
+- Rebind the WP8 convergence case to the root Mantle built with
+  `cache-inputs-build-roots-v1` from the WP8-signed cache using the checked
+  `mantle` executable. The realization receipt, store-info, handoff, decision
+  and producer-output copies are the built-root records; `bounds.clamp` is
+  `current` with `targets_current: true`.
+- Drop the preserve-route and unchecked-executable non-claims. Mantle does not
+  rebuild hydrated inputs and the bridge does not evaluate proofs.
+
 ## 2026-11-21
 
 - Add the `trellis-bounds-verus-job` producer package: an owner-authored
