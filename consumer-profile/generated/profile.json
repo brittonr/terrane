@@ -1,7 +1,7 @@
 {
   "artifacts": [
     {
-      "blake3": "2fa954e69796c98f09233ef445752d3ae6a953feb061ef75ff35724bff5bb87b",
+      "blake3": "cdcde7fa8e244f6cd4da336dc25d08c0937cf7cfae218f00b1ec66ad386d3808",
       "bytes": 5685,
       "path": "Cargo.toml"
     },
@@ -11,7 +11,7 @@
       "path": "LICENSE"
     },
     {
-      "blake3": "47386127f1e4f3a5db3c161b334e0a6eb3176b79a2ae6adbac1b4f779e17c467",
+      "blake3": "4b297b4ad379c7bd58fbb5a82826660e3292cfdfcef7a20270303d702f0d1676",
       "bytes": 52890,
       "path": "src/lib.rs"
     },
@@ -31,8 +31,8 @@
       "path": "src/ucan_ability.rs"
     },
     {
-      "blake3": "e3bfdd1fed32d657dc836d2a9b8478225233eff2be916d0e9e4bee3a7e5efe1b",
-      "bytes": 5925,
+      "blake3": "dfafe2dc9e5e4f168ea82d8541a6f01c391b13c35dbc96131066e1ad6603fa17",
+      "bytes": 6615,
       "path": "src/ucan_backend_transcript.rs"
     },
     {
@@ -213,14 +213,14 @@
   ],
   "package": {
     "default_features": false,
-    "dependency_coordinate": "git+https://github.com/OnixResearch/terrane?rev=df99309c31e95b8068d90153e362dad6234d0cca#verified-logic@0.2.0",
+    "dependency_coordinate": "git+https://github.com/OnixResearch/terrane?rev=c11837c5c6cdf2714fd9015da07196d53eea28eb#verified-logic@0.2.0",
     "name": "verified-logic",
-    "revision": "df99309c31e95b8068d90153e362dad6234d0cca",
+    "revision": "c11837c5c6cdf2714fd9015da07196d53eea28eb",
     "source_repository": "https://github.com/OnixResearch/terrane",
     "supported_features": [],
     "version": "0.2.0"
   },
-  "release_id": "verified-logic-0.2.0-ucan-profile-df99309",
+  "release_id": "verified-logic-0.2.0-ucan-profile-c11837c",
   "report_schema": "trellis-verified-logic-compatibility-report/v1",
   "required_non_claims": [
     "Imported Terrane primitives do not prove UCAN token correctness.",
@@ -278,7 +278,7 @@
   },
   "verification": {
     "proof_command": "./scripts/verus.sh src/lib.rs --rlimit 20",
-    "proof_manifest_blake3": "93d4105b47720646f886c4b3285e9a9be48e4fad7478f47fda1c0e4bfd070002",
+    "proof_manifest_blake3": "a42a24381b33737810cde95437fc7a3419e657d9b91d2071dc78f8ebf155dd33",
     "proof_manifest_bytes": 21530,
     "proof_manifest_path": "docs/proof-artifact-manifest.json",
     "proof_owner": "Terrane",

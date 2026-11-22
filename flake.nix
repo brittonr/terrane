@@ -38,7 +38,7 @@
       inputs.crane.follows = "crane";
     };
     trellis-consumer-release-src = {
-      url = "git+https://github.com/OnixResearch/terrane.git?rev=df99309c31e95b8068d90153e362dad6234d0cca";
+      url = "git+https://github.com/OnixResearch/terrane.git?rev=c11837c5c6cdf2714fd9015da07196d53eea28eb";
       flake = false;
     };
     verus-upgrade-trial-src = {
