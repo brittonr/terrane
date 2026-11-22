@@ -3,14 +3,14 @@
   "producer": "Trellis optional Preserves proof-manifest carrier",
   "source_manifest": {
     "path": "docs/proof-artifact-manifest.json",
-    "blake3": "93d4105b47720646f886c4b3285e9a9be48e4fad7478f47fda1c0e4bfd070002",
+    "blake3": "a42a24381b33737810cde95437fc7a3419e657d9b91d2071dc78f8ebf155dd33",
     "bytes": 21530
   },
   "envelopes": [
     {
       "envelope_id": "trellis.preserves.proof_artifact_manifest.seed",
       "schema_label": "trellis.proof-artifact-manifest.preserves.v1",
-      "source_manifest_digest": "93d4105b47720646f886c4b3285e9a9be48e4fad7478f47fda1c0e4bfd070002",
+      "source_manifest_digest": "a42a24381b33737810cde95437fc7a3419e657d9b91d2071dc78f8ebf155dd33",
       "primitive_ids": [
         "trellis.arithmetic.abs_diff",
         "trellis.consensus.fast_path.quorum",

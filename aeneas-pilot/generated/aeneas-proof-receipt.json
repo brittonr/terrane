@@ -179,7 +179,7 @@
   ],
   "artifact_verification": "valid",
   "verus_receipt_path": "docs/proof-evidence-bundle.json",
-  "verus_receipt_identity": "b3:5312d8baf35189a17dcf3f0c7e8b9895c4988ab9f7ad4898ad7057b98265cd8a",
+  "verus_receipt_identity": "b3:529cffee3b8955a4f833842ad3dc98065ad300703c4126ff76e750026ba7a73b",
   "octet_policy_artifact_identity": "b3:f9ce0a9b1dceef17c248677ab7479491b929c3e216a0b71123a86c1f23467914",
   "non_claims": [
     "does not prove Aeneas or Charon translation soundness",
@@ -191,5 +191,5 @@
     "does not prove verifier independence",
     "does not merge Verus and Aeneas proof authority"
   ],
-  "receipt_identity": "b3:d90f9977b0d4abc88cefd8fb0835e77bf05734b65af3a36f8681a4656d3c169f"
+  "receipt_identity": "b3:31d1ec5f40b313811cd80f102480d046bc730464b7a93733d4a3cc7539d68f0e"
 }

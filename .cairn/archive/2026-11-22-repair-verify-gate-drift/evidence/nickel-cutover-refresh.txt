@@ -1,0 +1,11 @@
+$ ./scripts/check-nickel-export-cutover.rs --write
+standalone Nickel export write passed: 9 outputs, 38 invalid fixtures
+EXIT=0
+$ ./scripts/check-nickel-export-cutover.rs --check
+standalone Nickel export check passed: 9 exact outputs, 38 invalid fixtures
+EXIT=0
+
+Stale destination removed before --write (destination_preexisting=false):
+  nickel-export-cutover/generated/outputs/proof-evidence-contract.json
+Cause: 96c5282 regenerated docs/proof-evidence-bundle.json, the imported material of
+json-artifacts/proof-evidence-bundle.ncl, without re-running the cutover writer.

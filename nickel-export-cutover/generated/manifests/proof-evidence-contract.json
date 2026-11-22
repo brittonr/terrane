@@ -21,7 +21,7 @@
       "dependencies": [
         {
           "path": "docs/proof-evidence-bundle.json",
-          "identity": "b3:5312d8baf35189a17dcf3f0c7e8b9895c4988ab9f7ad4898ad7057b98265cd8a",
+          "identity": "b3:529cffee3b8955a4f833842ad3dc98065ad300703c4126ff76e750026ba7a73b",
           "bytes": 28867
         },
         {
@@ -41,7 +41,7 @@
       "format": "json",
       "output": {
         "path": "nickel-export-cutover/generated/outputs/proof-evidence-contract.json",
-        "identity": "b3:e479c64390570ef6b4f7b53939f025d0e42e0f1a03e781b963850bccfb374c90",
+        "identity": "b3:9b2e6964f20900332af18e9b989e018eb383b95d1eb9610b99a32a460daa79b7",
         "bytes": 28867
       },
       "evaluator": {
@@ -56,5 +56,5 @@
       "non_claim": "Nickel export success proves only exact declared input and output identities under the recorded evaluator descriptor; it does not prove deployability, product-policy conformance, evaluator equivalence, build success, or release eligibility"
     }
   ],
-  "manifest_identity": "b3:3a532c7324c6a288bb7938c02b5cbdf537e51a6b2f0a2ec7111040be253c3d8e"
+  "manifest_identity": "b3:9ba6b289a3c0ca6a5dd2e3d725c9576a71f81c6d572aa97c66f9686867192ce8"
 }
