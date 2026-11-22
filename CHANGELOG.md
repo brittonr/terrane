@@ -27,6 +27,8 @@
 
 ## Unreleased
 
+- Move the `trellis-consumer-release-src` pin and the verified-logic consumer release profile to published revision `c11837c5c6cdf2714fd9015da07196d53eea28eb`. Refresh `release_id`, the dependency coordinate, every artifact row measured at the new revision, and the proof manifest identity; regenerate `consumer-profile/generated/profile.json` with `nickel export`. The selected modules, supported claim, and non-claims are unchanged.
+
 - Update current proofs to Verus `0.2026.10.18.7d82994`, Rust `1.99.1`, and matching `vstd`. Pin ordinary Cargo builds to `nightly-2026-10-14`.
 
 - Repair arithmetic, set, ordering, layout, transcript, and capability-tree proofs with explicit facts. Preserve contracts, trust boundaries, and the resource limit.

@@ -4194,16 +4194,16 @@
     "trellis-consumer-release-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1791980889,
-        "narHash": "sha256-gBNKDvAox0qfJz8DSWRgCX3wA+WxIgPEpv+gStEjh8E=",
+        "lastModified": 1795325091,
+        "narHash": "sha256-BbUK96Q0pcScjMFmm4gbkvY+Rd5A/Ns3tziNTtkNt1w=",
         "ref": "refs/heads/public-source-base-2026-10-14",
-        "rev": "df99309c31e95b8068d90153e362dad6234d0cca",
-        "revCount": 1,
+        "rev": "c11837c5c6cdf2714fd9015da07196d53eea28eb",
+        "revCount": 37,
         "type": "git",
         "url": "https://github.com/OnixResearch/terrane.git"
       },
       "original": {
-        "rev": "df99309c31e95b8068d90153e362dad6234d0cca",
+        "rev": "c11837c5c6cdf2714fd9015da07196d53eea28eb",
         "type": "git",
         "url": "https://github.com/OnixResearch/terrane.git"
       }

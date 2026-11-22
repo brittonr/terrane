@@ -3,7 +3,7 @@
 Terrane owns the proof semantics and source identity for `verified-logic`.
 [`consumer-profile/profile.ncl`](../consumer-profile/profile.ncl) and its
 [checked JSON projection](../consumer-profile/generated/profile.json) bind the
-independently published Terrane source at `df99309c31e95b8068d90153e362dad6234d0cca`.
+independently published Terrane source at `c11837c5c6cdf2714fd9015da07196d53eea28eb`.
 The versioned `trellis-*` schema IDs remain protocol identities. Historical
 Trellis receipts and private revisions are not relabelled as this public source.
 
@@ -18,7 +18,7 @@ has no supported Cargo features:
 [dependencies]
 verified-logic = {
   git = "https://github.com/OnixResearch/terrane",
-  rev = "df99309c31e95b8068d90153e362dad6234d0cca",
+  rev = "c11837c5c6cdf2714fd9015da07196d53eea28eb",
   default-features = false,
 }
 ```
