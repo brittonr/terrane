@@ -1,0 +1,22 @@
+$ ./scripts/check-verified-primitive-manifest.rs
+verified primitive manifest check passed: 17 primitives, 1 preserves envelopes, 11 fixtures checked
+EXIT=0
+$ ./scripts/check-verified-primitive-manifest.rs --self-test
+verified primitive manifest check passed: 1 primitives, 1 preserves envelopes, 1 fixtures checked
+EXIT=0
+
+$ b3sum --no-names src/scheme_logic/syntax.rs
+e62d49197a979603845f3890ef388e459cc30e45d535a3f43a27718ff0ce93ec
+$ stat -c%s src/scheme_logic/syntax.rs
+9945
+$ b3sum --no-names docs/proof-artifact-manifest.json
+a42a24381b33737810cde95437fc7a3419e657d9b91d2071dc78f8ebf155dd33
+$ stat -c%s docs/proof-artifact-manifest.json
+21530
+
+Row refreshed: trellis.scheme.reader.structure
+  was: 9914 bytes / 7b1b8f3c8c63109888192724e22009f465b1411263460c3027459c4b363f4b37
+  now: 9945 bytes / e62d49197a979603845f3890ef388e459cc30e45d535a3f43a27718ff0ce93ec
+Cause: 96c5282 changed src/scheme_logic/syntax.rs (+5/-1) without refreshing the row.
+Preserves carrier re-bound: docs/proof-artifact-manifest.preserves-envelope.json
+  source_manifest.blake3 / source_manifest_digest -> a42a24381b33737810cde95437fc7a3419e657d9b91d2071dc78f8ebf155dd33 (21530 bytes)

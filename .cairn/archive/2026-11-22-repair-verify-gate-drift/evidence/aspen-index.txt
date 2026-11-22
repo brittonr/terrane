@@ -1,0 +1,10 @@
+warning: unable to download 'http://100.100.103.95:39400/ksswymvalh7ggrw48svihm6x3vfhzqmz.narinfo': Could not connect to server (7) Failed to connect to 100.100.103.95 port 39400 after 3 ms: Could not connect to server; retrying in 2 ms (attempt 1/5)
+warning: unable to download 'http://100.100.103.95:39400/ksswymvalh7ggrw48svihm6x3vfhzqmz.narinfo': Could not connect to server (7) Failed to connect to 100.100.103.95 port 39400 after 1 ms: Could not connect to server; retrying in 35 ms (attempt 2/5)
+warning: unable to download 'http://100.100.103.95:39400/ksswymvalh7ggrw48svihm6x3vfhzqmz.narinfo': Could not connect to server (7) Failed to connect to 100.100.103.95 port 39400 after 40 ms: Could not connect to server; retrying in 172 ms (attempt 3/5)
+warning: unable to download 'http://100.100.103.95:39400/ksswymvalh7ggrw48svihm6x3vfhzqmz.narinfo': Could not connect to server (7) Failed to connect to 100.100.103.95 port 39400 after 0 ms: Could not connect to server; retrying in 227 ms (attempt 4/5)
+disabling binary cache 'http://100.100.103.95:39400' for 60 seconds
+error: unable to download 'http://100.100.103.95:39400/ksswymvalh7ggrw48svihm6x3vfhzqmz.narinfo': Could not connect to server (7) Failed to connect to 100.100.103.95 port 39400 after 0 ms: Could not connect to server
+warning: unknown experimental feature 'wasm-builtin'
+warning: nix-grpc-store: no plugin build matching the loaded libnixstore in '/nix/store/flxfh4xym8i201q71p69xg684xm86a9h-nix-grpc-store-0.1.0-beta.4/lib/nix/nix-grpc-store-versions'. grpc:// stores are unavailable
+aspen evidence index valid: 8 rows
+EXIT=0

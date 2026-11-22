@@ -5,7 +5,7 @@
   "source_identity": "b3:3064658eb9d27a1c1c423abbad9e9c8878756594f07a1d01eeb6b3efef4fa8a4",
   "run_identity": "b3:7cc1238cc725aa62988873109fba280fd88af0d5e8ce37d9f15a3f650a851500",
   "receipt_path": "aeneas-pilot/generated/aeneas-proof-receipt.json",
-  "receipt_identity": "b3:d90f9977b0d4abc88cefd8fb0835e77bf05734b65af3a36f8681a4656d3c169f",
+  "receipt_identity": "b3:31d1ec5f40b313811cd80f102480d046bc730464b7a93733d4a3cc7539d68f0e",
   "properties": [
     {
       "theorem_id": "trellis.abs-diff.symmetry",
@@ -46,5 +46,5 @@
     "does not prove verifier independence",
     "does not merge Verus and Aeneas proof authority"
   ],
-  "manifest_identity": "b3:a767a0e0c7bc27de91021c12ef712d0dbde631bb90a3dceef8d3825d1aa95fbc"
+  "manifest_identity": "b3:55b6a949504f4f329f0667677176a5b4316347ca9155f4a15019119ae315bff7"
 }

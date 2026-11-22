@@ -1,0 +1,12 @@
+$ ./scripts/check-aeneas-cross-verifier.rs --write
+aeneas cross-verifier passed: 2 theorems, receipt b3:31d1ec5f40b313811cd80f102480d046bc730464b7a93733d4a3cc7539d68f0e, manifest b3:55b6a949504f4f329f0667677176a5b4316347ca9155f4a15019119ae315bff7
+EXIT=0
+$ ./scripts/check-aeneas-cross-verifier.rs --check
+aeneas cross-verifier passed: 2 theorems, receipt b3:31d1ec5f40b313811cd80f102480d046bc730464b7a93733d4a3cc7539d68f0e, manifest b3:55b6a949504f4f329f0667677176a5b4316347ca9155f4a15019119ae315bff7
+EXIT=0
+$ ./scripts/check-aeneas-cross-verifier.rs --self-test
+aeneas cross-verifier self-test passed: trellis.abs-diff.aeneas-cross-verifier-v1 positive profile, 18 catalog negative cases, 8 provider source negative cases
+EXIT=0
+
+Cause: the receipt binds verus_receipt_identity = BLAKE3 of docs/proof-evidence-bundle.json
+(profile verus.receipt_path), regenerated in 96c5282.

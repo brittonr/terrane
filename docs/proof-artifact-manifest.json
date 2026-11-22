@@ -130,8 +130,8 @@
       ],
       "source": {
         "path": "src/scheme_logic/syntax.rs",
-        "blake3": "7b1b8f3c8c63109888192724e22009f465b1411263460c3027459c4b363f4b37",
-        "bytes": 9914
+        "blake3": "e62d49197a979603845f3890ef388e459cc30e45d535a3f43a27718ff0ce93ec",
+        "bytes": 9945
       },
       "proof": {
         "path": "src/scheme_logic/proofs/reader.rs",
